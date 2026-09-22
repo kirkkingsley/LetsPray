@@ -1002,6 +1002,7 @@ if (currentLeaderId) {
 
   function chooseCurrentLeader(leaderId) {
   setCurrentLeaderId(leaderId);
+    if (leaderId) setFilter("my-group");
 
   if (leaderId) {
     localStorage.setItem("letspray-current-leader", leaderId);
