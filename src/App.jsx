@@ -1305,8 +1305,12 @@ setPeople(prev => [...prev, {
             ) : (
               <div style={S.empty}>
                 <Heart size={36} fill={C.prayedGreen} color={C.prayedGreen} />
-                <p style={S.emptyTitle}>All prayed for!</p>
-                <p style={S.emptySub}>Everyone in this group has been prayed for this week.</p>
+              <p style={S.emptyTitle}>{filter === "my-group" && getFiltered().length === 0 ? "No students assigned" : "All prayed for!"}</p>
+              <p style={S.emptySub}>
+  {filter === "my-group" && getFiltered().length === 0
+    ? "No students have been assigned to this small group yet."
+    : "Everyone in this group has been prayed for this week."}
+</p>
                 <button onClick={() => startKeepPraying(getFiltered())} style={{ background:C.accent, border:"none", color:C.bg, borderRadius:12, padding:"13px 28px", fontSize:14, fontWeight:600, cursor:"pointer", fontFamily:"'Inter', system-ui, sans-serif", boxShadow:"0 4px 20px rgba(201,152,42,0.3)", marginTop:8 }}>
                   Keep Praying
                 </button>
