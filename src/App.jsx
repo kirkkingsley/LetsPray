@@ -1568,6 +1568,21 @@ function markRequestAnswered(personId, idx) {
     ? `${people.find(p => p.id === currentLeaderId)?.name || "Leader"} · ${people.filter(p => p.active !== false && p.type === "student" && p.smallGroupLeader === currentLeaderId).length} students`
     : "Select yourself on the Pray tab to view your small group."}
 </p>
+    <div style={{ marginBottom: 14, fontSize: 14, color: C.cream }}>
+  {people.filter(p =>
+    p.active !== false &&
+    p.type === "student" &&
+    p.smallGroupLeader === currentLeaderId &&
+    withinWeek(p.leaderPrayerDates?.[currentLeaderId])
+  ).length}
+  {" of "}
+  {people.filter(p =>
+    p.active !== false &&
+    p.type === "student" &&
+    p.smallGroupLeader === currentLeaderId
+  ).length}
+  {" prayed for this week"}
+</div>
     <div style={S.weekSection}>
   <div style={S.sectionHead}>
     <span style={S.sectionTitle}>My Students</span>
@@ -1588,6 +1603,9 @@ function markRequestAnswered(personId, idx) {
       >
         <div>
           <div style={S.weekName}>{p.name}</div>
+          <div style={{ ...S.weekMeta, color: withinWeek(p.leaderPrayerDates?.[currentLeaderId]) ? C.prayedGreen : C.muted }}>
+  {withinWeek(p.leaderPrayerDates?.[currentLeaderId]) ? "✓ Prayed this week" : "Needs prayer"}
+</div>
           <div style={S.weekMeta}>
             {p.group ? p.group.toUpperCase() : ""}
             {p.grade ? ` · ${ordinal(p.grade)} Grade` : ""}
