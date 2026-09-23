@@ -1442,7 +1442,7 @@ function markRequestAnswered(personId, idx) {
 <span style={S.reqText}>
   {typeof req !== "string" && req.status === "answered" ? `PRAISE — ${req.text}` : (typeof req === "string" ? req : req.text)}
 </span>                             {(typeof req === "string" || req.status !== "answered") && (
-  <button onClick={() => markRequestAnswered(current.id, i)} style={S.reqRemove}>Praise</button>
+  <button onClick={() => markRequestAnswered(current.id, i)} style={S.reqPraise}
 )}
                               <button onClick={() => removeRequest(current.id, i)} style={S.reqRemove}><X size={11} /></button>
                             </div>
@@ -2114,6 +2114,7 @@ const S = {
   reqDot: { color: C.accent, fontSize: 8, marginTop: 3, flexShrink: 0 },
   reqText: { flex: 1, fontSize: 13, color: C.cream, lineHeight: 1.4 },
   reqRemove: { background: "none", border: "none", color: C.muted, cursor: "pointer", padding: 2, display: "flex", flexShrink: 0 },
+  reqPraise: { background: C.accentSoft, border: `1px solid ${C.accent}`, color: C.accent, borderRadius: 8, padding: "4px 8px", fontSize: 11, fontWeight: 600, cursor: "pointer", flexShrink: 0 },
   reqInputRow: { display: "flex", gap: 6, alignItems: "center", marginTop: 4 },
   reqInput: { flex: 1, background: C.faint, border: `1px solid ${C.border}`, borderRadius: 8, color: C.cream, padding: "7px 10px", fontSize: 13, fontFamily: "'Inter', system-ui, sans-serif", outline: "none" },
   reqAddBtn: { background: C.accent, border: "none", color: "#fff", borderRadius: 8, padding: "7px 12px", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'Inter', system-ui, sans-serif" },
