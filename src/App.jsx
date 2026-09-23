@@ -846,6 +846,17 @@ if (order === "oldest") return getFiltered()
 const leaderGroup = activePeople.filter(
   p => p.type === "student" && p.smallGroupLeader === currentLeaderId
 );
+  const leaderActiveRequests = leaderGroup.reduce(
+  (count, p) =>
+    count +
+    (p.prayerRequests || []).filter(
+      req => typeof req === "string" || req.status !== "answered"
+    ).length,
+  0
+);
+  const leaderFollowUpCount = leaderGroup.filter(
+  p => p.leaderFollowUps?.[currentLeaderId]
+).length;
 
 const leaderPrayedThisWeek = leaderGroup.filter(
   p => withinWeek(p.leaderPrayerDates?.[currentLeaderId])
@@ -1389,12 +1400,35 @@ function markRequestAnswered(personId, idx) {
             ) : (
               <div style={S.empty}>
                 <Heart size={36} fill={C.prayedGreen} color={C.prayedGreen} />
-              <p style={S.emptyTitle}>{filter === "my-group" && getFiltered().length === 0 ? "No students assigned" : "All prayed for!"}</p>
+           <p style={S.emptyTitle}>{filter === "my-group" && getFiltered().length === 0 ? "No students assigned" : filter === "my-group" ? "Your group is covered this week." : "All prayed for!"}</p>
               <p style={S.emptySub}>
-  {filter === "my-group" && getFiltered().length === 0
-    ? "No students have been assigned to this small group yet."
+ {filter === "my-group" && getFiltered().length === 0
+  ? "No students have been assigned to this small group yet."
+  : filter === "my-group"
+    ? `You prayed for all ${leaderGroup.length} students in your group this week.`
     : "Everyone in this group has been prayed for this week."}
 </p>
+                {filter === "my-group" && (
+  <p style={{ ...S.emptySub, marginTop: 8 }}>
+    {leaderActiveRequests} active prayer {leaderActiveRequests === 1 ? "request" : "requests"} · {leaderFollowUpCount} {leaderFollowUpCount === 1 ? "follow-up" : "follow-ups"} remaining
+  </p>
+)}
+                {filter === "my-group" && (
+  <button
+    onClick={() => setView("dashboard")}
+    style={{
+      background: "transparent",
+      border: `1px solid ${C.accent}`,
+      color: C.accent,
+      borderRadius: 8,
+      padding: "8px 14px",
+      marginBottom: 12,
+      cursor: "pointer"
+    }}
+  >
+    View Dashboard
+  </button>
+)}
                 <button onClick={() => startKeepPraying(getFiltered())} style={{ background:C.accent, border:"none", color:C.bg, borderRadius:12, padding:"13px 28px", fontSize:14, fontWeight:600, cursor:"pointer", fontFamily:"'Inter', system-ui, sans-serif", boxShadow:"0 4px 20px rgba(201,152,42,0.3)", marginTop:8 }}>
                   Keep Praying
                 </button>
