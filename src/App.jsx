@@ -841,6 +841,24 @@ if (order === "oldest") return getFiltered()
   const pinnedPerson = pinnedPersonId ? activePeople.find(p => p.id === pinnedPersonId) ?? null : null;
   const current = pinnedPerson ?? deck[cardIdx] ?? null;
 
+  const currentLeader = people.find(p => p.id === currentLeaderId) ?? null;
+
+const leaderGroup = activePeople.filter(
+  p => p.type === "student" && p.smallGroupLeader === currentLeaderId
+);
+
+const leaderPrayedThisWeek = leaderGroup.filter(
+  p => withinWeek(p.leaderPrayerDates?.[currentLeaderId])
+);
+
+const leaderStillWaiting = leaderGroup.filter(
+  p => !withinWeek(p.leaderPrayerDates?.[currentLeaderId])
+);
+
+const leaderFollowUps = leaderGroup.filter(
+  p => p.leaderFollowUps?.[currentLeaderId]
+);
+
   const prayedPeople = activePeople.filter(p => withinWeek(p.prayedAt));
 
   // Streak: consecutive weeks where count >= total (everyone prayed for)
@@ -1259,7 +1277,7 @@ function markRequestAnswered(personId, idx) {
 
       {/* Tabs */}
       <nav style={S.tabs}>
-        {[["pray","Pray"],["week","Week"],["roster","Roster"]].map(([v, label]) => (
+{[["pray","Pray"],["week","Week"],["roster","Roster"],["dashboard","Dashboard"]].map(([v, label]) => (
           <button key={v} onClick={() => setView(v)} style={{ ...S.tab, ...(view === v ? S.tabActive : {}) }}>{label}</button>
         ))}
         {adminAuthed && [["people","People"],["report","Report"],["import","Import"]].map(([v, label]) => (
@@ -1541,6 +1559,16 @@ function markRequestAnswered(personId, idx) {
         </div>
       )}
 
+   {/* — LEADER DASHBOARD — */}
+{view === "dashboard" && (
+  <div style={S.weekWrap}>
+    <h2 style={S.weekTitle}>Leader Dashboard</h2>
+    <p style={{ color: C.muted }}>
+      Your small group at a glance.
+    </p>
+  </div>
+)}
+      
       {/* ─── WEEK SUMMARY ─── */}
       {view === "week" && (
         <div style={S.weekWrap}>
