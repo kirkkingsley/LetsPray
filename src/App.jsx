@@ -1107,13 +1107,39 @@ setPeople(prev => [...prev, {
 
   function addRequest(personId) {
     if (!reqText.trim()) return;
-    setPeople(prev => prev.map(p => p.id === personId ? { ...p, prayerRequests: [...(p.prayerRequests || []), reqText.trim()], updatedAt: Date.now() } : p));
+    setPeople(prev =>setPeople(prev => prev.map(p => p.id === personId ? { ...p, prayerRequests: [...(p.prayerRequests || []), { text: reqText.trim(), status: "active", createdAt: Date.now() }], updatedAt: Date.now() } : p));
     setReqText(""); setReqFor(null);
   }
 
   function removeRequest(personId, idx) {
     setPeople(prev => prev.map(p => p.id === personId ? { ...p, prayerRequests: p.prayerRequests.filter((_, i) => i !== idx), updatedAt: Date.now() } : p));
   }
+function markRequestAnswered(personId, idx) {
+  setPeople(prev => prev.map(p => {
+    if (p.id !== personId) return p;
+
+    const prayerRequests = (p.prayerRequests || []).map((req, i) => {
+      if (i !== idx) return req;
+
+      if (typeof req === "string") {
+        return {
+          text: req,
+          status: "answered",
+          answeredAt: Date.now()
+        };
+      }
+
+      return {
+        ...req,
+        status: "answered",
+        answeredAt: Date.now()
+      };
+    });
+
+    return { ...p, prayerRequests, updatedAt: Date.now() };
+  }));
+}
+  
 
   function handleFile(e) {
     const file = e.target.files[0];
@@ -1413,7 +1439,11 @@ setPeople(prev => [...prev, {
                           {current.prayerRequests.map((req, i) => (
                             <div key={i} style={S.reqItem}>
                               <span style={S.reqDot}>◆</span>
-                              <span style={S.reqText}>{req}</span>
+<span style={S.reqText}>
+  {typeof req !== "string" && req.status === "answered" ? `PRAISE — ${req.text}` : (typeof req === "string" ? req : req.text)}
+</span>                             {(typeof req === "string" || req.status !== "answered") && (
+  <button onClick={() => markRequestAnswered(current.id, i)} style={S.reqRemove}>Praise</button>
+)}
                               <button onClick={() => removeRequest(current.id, i)} style={S.reqRemove}><X size={11} /></button>
                             </div>
                           ))}
