@@ -977,6 +977,24 @@ if (currentLeaderId) {
     setPinnedPersonId(null);
     setKeepPrayingMode(false); // return to celebration screen after Pray Again
   }
+function toggleFollowUp(personId) {
+  if (!currentLeaderId) return;
+
+  setPeople(prev => prev.map(p => {
+    if (p.id !== personId) return p;
+
+    const leaderFollowUps = { ...(p.leaderFollowUps || {}) };
+
+    if (leaderFollowUps[currentLeaderId]) {
+      delete leaderFollowUps[currentLeaderId];
+    } else {
+      leaderFollowUps[currentLeaderId] = Date.now();
+    }
+
+    return { ...p, leaderFollowUps, updatedAt: Date.now() };
+  }));
+}
+  
 
   function startKeepPraying(pool) {
     const p = pool || activePeople;
@@ -1474,6 +1492,11 @@ function markRequestAnswered(personId, idx) {
                     <button onClick={() => navWithAnim(1)} style={S.navArrow}><ChevronRight size={22} /></button>
                   </div>
 
+               {currentLeaderId && (
+  <button onClick={() => toggleFollowUp(current.id)} style={S.followUpBtn}>
+    {current?.leaderFollowUps?.[currentLeaderId] ? "✓ Follow Up Flagged" : "+ Follow Up"}
+  </button>
+)}
                   {withinWeek(current?.prayedAt) && !pinnedPerson && !keepPrayingMode ? (
                     <div style={S.prayedActions}>
                       <div style={S.prayedConfirm}><Heart size={16} fill={C.prayedGreen} color={C.prayedGreen} style={{ marginRight: 7 }} /> Prayed!</div>
@@ -2124,7 +2147,7 @@ const S = {
   prayBtn: { background: C.accent, border: "none", color: "#fff", borderRadius: 12, padding: "14px 0", fontSize: 15, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Inter', system-ui, sans-serif", boxShadow: `0 4px 24px rgba(107,158,120,0.4)`, letterSpacing: "0.02em" },
   prayedActions: { display: "flex", alignItems: "center", justifyContent: "center", gap: 12 },
   prayedConfirm: { display: "flex", alignItems: "center", color: C.prayedGreen, fontSize: 15, fontWeight: 500 },
-  undoBtn: { background: "none", border: `1px solid ${C.border}`, color: C.muted, borderRadius: 8, padding: "6px 14px", fontSize: 12, cursor: "pointer", fontFamily: "'Inter', system-ui, sans-serif" },
+  undoBtn: { background: "none", border: `1px solid ${C.border}`, color: C.muted, borderRadius: 8, padding: "6px 14px", fontSize: 12, cursor: "pointer", fontFamily: "'Inter', system-ui, sans-serif" }, followUpBtn: { background: "none", border: `1px solid ${C.accent}`, color: C.accent, borderRadius: 10, padding: "8px 14px", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 10, alignSelf: "center" },
   // WEEK
   weekWrap: { flex: 1, padding: "16px 20px 32px", display: "flex", flexDirection: "column", gap: 14, overflowY: "auto" },
   weekTitle: { fontFamily: "'Lora', Georgia, serif", fontSize: 28, color: C.cream, margin: 0, fontWeight: 400 },
