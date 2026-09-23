@@ -1699,10 +1699,9 @@ width: `${leaderGroup.length ? (leaderPrayedThisWeek.length / leaderGroup.length
   onClick={e => e.stopPropagation()}
   onChange={e => saveFollowUpNote(p.id, e.target.value)}
   style={S.reqInput}
-/>
-        <div style={{ fontSize: 11, color: C.muted, marginTop: 4 }}>
+/><div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 11, color: C.muted, marginTop: 4 }}>
   Saved automatically
-</div>
+
            <label
   onClick={e => e.stopPropagation()}
   style={{
@@ -1720,6 +1719,7 @@ width: `${leaderGroup.length ? (leaderPrayedThisWeek.length / leaderGroup.length
   />
   Mark Complete
 </label>
+  </div>
             </div>
         </div>
       ))}
