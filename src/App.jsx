@@ -1703,14 +1703,23 @@ width: `${leaderGroup.length ? (leaderPrayedThisWeek.length / leaderGroup.length
         <div style={{ fontSize: 11, color: C.muted, marginTop: 4 }}>
   Saved automatically
 </div>
-            <button
-  onClick={e => {
-    e.stopPropagation();
-    toggleFollowUp(p.id);
+           <label
+  onClick={e => e.stopPropagation()}
+  style={{
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 5,
+    fontSize: 11,
+    color: C.muted,
+    cursor: "pointer"
   }}
 >
-  ✓ Mark Complete
-</button>
+  <input
+    type="checkbox"
+    onChange={() => toggleFollowUp(p.id)}
+  />
+  Mark Complete
+</label>
             </div>
         </div>
       ))}
