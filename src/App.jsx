@@ -1563,9 +1563,39 @@ function markRequestAnswered(personId, idx) {
 {view === "dashboard" && (
   <div style={S.weekWrap}>
     <h2 style={S.weekTitle}>Leader Dashboard</h2>
-    <p style={{ color: C.muted }}>
-      Your small group at a glance.
-    </p>
+   <p style={{ color: C.muted }}>
+  {currentLeaderId
+    ? `${people.find(p => p.id === currentLeaderId)?.name || "Leader"} · ${people.filter(p => p.active !== false && p.type === "student" && p.smallGroupLeader === currentLeaderId).length} students`
+    : "Select yourself on the Pray tab to view your small group."}
+</p>
+    <div style={S.weekSection}>
+  <div style={S.sectionHead}>
+    <span style={S.sectionTitle}>My Students</span>
+  </div>
+
+  {people
+    .filter(p =>
+      p.active !== false &&
+      p.type === "student" &&
+      p.smallGroupLeader === currentLeaderId
+    )
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(p => (
+      <div
+        key={p.id}
+        onClick={() => goToPerson(p.id)}
+        style={{ ...S.weekRow, cursor: "pointer" }}
+      >
+        <div>
+          <div style={S.weekName}>{p.name}</div>
+          <div style={S.weekMeta}>
+            {p.group ? p.group.toUpperCase() : ""}
+            {p.grade ? ` · ${ordinal(p.grade)} Grade` : ""}
+          </div>
+        </div>
+      </div>
+    ))}
+</div>
   </div>
 )}
       
