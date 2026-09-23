@@ -1658,6 +1658,51 @@ function markRequestAnswered(personId, idx) {
       ))}
   </div>
 )}
+    {people.some(p =>
+  p.active !== false &&
+  p.type === "student" &&
+  p.smallGroupLeader === currentLeaderId &&
+  (p.prayerRequests || []).some(req =>
+    typeof req === "string" || req.status !== "answered"
+  )
+) && (
+  <div style={S.weekSection}>
+    <div style={S.sectionHead}>
+      <span style={S.sectionTitle}>Prayer Requests</span>
+    </div>
+
+    {people
+      .filter(p =>
+        p.active !== false &&
+        p.type === "student" &&
+        p.smallGroupLeader === currentLeaderId &&
+        (p.prayerRequests || []).some(req =>
+          typeof req === "string" || req.status !== "answered"
+        )
+      )
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map(p => (
+        <div
+          key={p.id}
+          onClick={() => goToPerson(p.id)}
+          style={{ ...S.weekRow, cursor: "pointer" }}
+        >
+          <div>
+            <div style={S.weekName}>{p.name}</div>
+            {(p.prayerRequests || [])
+              .filter(req =>
+                typeof req === "string" || req.status !== "answered"
+              )
+              .map((req, i) => (
+                <div key={i} style={S.weekMeta}>
+                  {typeof req === "string" ? req : req.text}
+                </div>
+              ))}
+          </div>
+        </div>
+      ))}
+  </div>
+)}
   </div>
 )}
       
