@@ -1492,7 +1492,7 @@ function markRequestAnswered(personId, idx) {
                     <button onClick={() => navWithAnim(1)} style={S.navArrow}><ChevronRight size={22} /></button>
                   </div>
 
-               {currentLeaderId && (
+          {(
   <button onClick={() => toggleFollowUp(current.id)} style={S.followUpBtn}>
     {current?.leaderFollowUps?.[currentLeaderId] ? "✓ Follow Up Flagged" : "+ Follow Up"}
   </button>
