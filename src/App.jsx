@@ -1699,6 +1699,9 @@ width: `${leaderGroup.length ? (leaderPrayedThisWeek.length / leaderGroup.length
   onChange={e => saveFollowUpNote(p.id, e.target.value)}
   style={S.reqInput}
 />
+          <span style={{ fontSize: 11, color: C.muted }}>
+  Saved automatically
+</span>
         </div>
       ))}
   </div>
