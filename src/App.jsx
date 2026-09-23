@@ -1602,7 +1602,14 @@ function markRequestAnswered(personId, idx) {
         style={{ ...S.weekRow, cursor: "pointer" }}
       >
         <div>
-          <div style={S.weekName}>{p.name}</div>
+<div style={{ ...S.weekName, display: "flex", alignItems: "center", gap: 8 }}>
+  <span>{p.name}</span>
+  {p.leaderFollowUps?.[currentLeaderId] && (
+    <span style={{ fontSize: 10, color: C.accent, fontWeight: 600 }}>
+      FOLLOW UP
+    </span>
+  )}
+</div>
           <div style={{ ...S.weekMeta, color: withinWeek(p.leaderPrayerDates?.[currentLeaderId]) ? C.prayedGreen : C.muted }}>
   {withinWeek(p.leaderPrayerDates?.[currentLeaderId]) ? "✓ Prayed this week" : "Needs prayer"}
 </div>
