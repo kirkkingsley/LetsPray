@@ -1621,6 +1621,43 @@ function markRequestAnswered(personId, idx) {
       </div>
     ))}
 </div>
+    {people.some(p =>
+  p.active !== false &&
+  p.type === "student" &&
+  p.smallGroupLeader === currentLeaderId &&
+  p.leaderFollowUps?.[currentLeaderId]
+) && (
+  <div style={S.weekSection}>
+    <div style={S.sectionHead}>
+      <span style={S.sectionTitle}>
+        Follow Ups · {people.filter(p =>
+          p.active !== false &&
+          p.type === "student" &&
+          p.smallGroupLeader === currentLeaderId &&
+          p.leaderFollowUps?.[currentLeaderId]
+        ).length}
+      </span>
+    </div>
+
+    {people
+      .filter(p =>
+        p.active !== false &&
+        p.type === "student" &&
+        p.smallGroupLeader === currentLeaderId &&
+        p.leaderFollowUps?.[currentLeaderId]
+      )
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map(p => (
+        <div
+          key={p.id}
+          onClick={() => goToPerson(p.id)}
+          style={{ ...S.weekRow, cursor: "pointer" }}
+        >
+          <div style={S.weekName}>{p.name}</div>
+        </div>
+      ))}
+  </div>
+)}
   </div>
 )}
       
