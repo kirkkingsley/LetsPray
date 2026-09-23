@@ -1493,7 +1493,7 @@ function markRequestAnswered(personId, idx) {
                   </div>
 
           {(
-  <button onClick={() => toggleFollowUp(current.id)} style={S.followUpBtn}>
+ <button onClick={() => toggleFollowUp(current.id)} style={{ background:"red", color:"white", padding:"20px", fontSize:20, display:"block", width:"100%" }}>
     {current?.leaderFollowUps?.[currentLeaderId] ? "✓ Follow Up Flagged" : "+ Follow Up"}
   </button>
 )}
