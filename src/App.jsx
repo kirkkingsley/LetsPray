@@ -1703,6 +1703,14 @@ width: `${leaderGroup.length ? (leaderPrayedThisWeek.length / leaderGroup.length
         <div style={{ fontSize: 11, color: C.muted, marginTop: 4 }}>
   Saved automatically
 </div>
+            <button
+  onClick={e => {
+    e.stopPropagation();
+    toggleFollowUp(p.id);
+  }}
+>
+  ✓ Mark Complete
+</button>
             </div>
         </div>
       ))}
