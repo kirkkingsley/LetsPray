@@ -1492,9 +1492,8 @@ function markRequestAnswered(personId, idx) {
                     <button onClick={() => navWithAnim(1)} style={S.navArrow}><ChevronRight size={22} /></button>
                   </div>
 
-          {(
- <button onClick={() => toggleFollowUp(current.id)} style={{ background:"red", color:"white", padding:"20px", fontSize:20, display:"block", width:"100%" }}>
-    {current?.leaderFollowUps?.[currentLeaderId] ? "✓ Follow Up Flagged" : "+ Follow Up"}
+        {currentLeaderId && (
+<button onClick={() => toggleFollowUp(current.id)} style={{ background:"transparent", border:`1px solid ${C.accent}`, color:C.accent, borderRadius:10, padding:"9px 16px", fontSize:12, fontWeight:600, cursor:"pointer", display:"block", width:"100%", marginBottom:10 }}>    {current?.leaderFollowUps?.[currentLeaderId] ? "✓ Follow Up Flagged" : "+ Follow Up"}
   </button>
 )}
                   {withinWeek(current?.prayedAt) && !pinnedPerson && !keepPrayingMode ? (
