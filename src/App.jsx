@@ -1606,6 +1606,20 @@ function markRequestAnswered(personId, idx) {
   ).length}
   {" prayed for this week"}
 </div>
+    <div style={{
+  height: 8,
+  background: C.faint,
+  borderRadius: 999,
+  overflow: "hidden",
+  marginBottom: 18
+}}>
+  <div style={{
+    height: "100%",
+width: `${leaderGroup.length ? (leaderPrayedThisWeek.length / leaderGroup.length) * 100 : 0}%`,    background: C.accent,
+    borderRadius: 999,
+    transition: "width 0.3s ease"
+  }} />
+</div>
     <div style={S.weekSection}>
   <div style={S.sectionHead}>
     <span style={S.sectionTitle}>My Students</span>
