@@ -1442,8 +1442,8 @@ function markRequestAnswered(personId, idx) {
 <span style={S.reqText}>
   {typeof req !== "string" && req.status === "answered" ? `PRAISE — ${req.text}` : (typeof req === "string" ? req : req.text)}
 </span>                             {(typeof req === "string" || req.status !== "answered") && (
-  <button onClick={() => markRequestAnswered(current.id, i)} style={S.reqPraise}
-)}
+<button onClick={() => markRequestAnswered(current.id, i)} style={S.reqPraise}>Praise</button>
+  )}
                               <button onClick={() => removeRequest(current.id, i)} style={S.reqRemove}><X size={11} /></button>
                             </div>
                           ))}
