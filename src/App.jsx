@@ -1006,8 +1006,31 @@ function toggleFollowUp(personId) {
     if (leaderFollowUps[currentLeaderId]) {
       delete leaderFollowUps[currentLeaderId];
     } else {
-      leaderFollowUps[currentLeaderId] = Date.now();
+   leaderFollowUps[currentLeaderId] = {
+  flaggedAt: Date.now(),
+  note: ""
+};
     }
+
+    return { ...p, leaderFollowUps, updatedAt: Date.now() };
+  }));
+}
+  function saveFollowUpNote(personId, note) {
+  if (!currentLeaderId) return;
+
+  setPeople(prev => prev.map(p => {
+    if (p.id !== personId) return p;
+
+    const leaderFollowUps = { ...(p.leaderFollowUps || {}) };
+    const existing = leaderFollowUps[currentLeaderId];
+
+    leaderFollowUps[currentLeaderId] = {
+      flaggedAt:
+        typeof existing === "object" && existing?.flaggedAt
+          ? existing.flaggedAt
+          : Date.now(),
+      note: note
+    };
 
     return { ...p, leaderFollowUps, updatedAt: Date.now() };
   }));
@@ -1654,6 +1677,14 @@ function markRequestAnswered(personId, idx) {
           style={{ ...S.weekRow, cursor: "pointer" }}
         >
           <div style={S.weekName}>{p.name}</div>
+          <input
+  type="text"
+  placeholder="Add follow-up note..."
+  value={p.leaderFollowUps?.[currentLeaderId]?.note || ""}
+  onClick={e => e.stopPropagation()}
+  onChange={e => saveFollowUpNote(p.id, e.target.value)}
+  style={S.reqInput}
+/>
         </div>
       ))}
   </div>
