@@ -1691,6 +1691,7 @@ width: `${leaderGroup.length ? (leaderPrayedThisWeek.length / leaderGroup.length
           style={{ ...S.weekRow, cursor: "pointer" }}
         >
           <div style={S.weekName}>{p.name}</div>
+          <div style={{ flex: 1 }}>
           <input
   type="text"
   placeholder="Add follow-up note..."
@@ -1702,6 +1703,7 @@ width: `${leaderGroup.length ? (leaderPrayedThisWeek.length / leaderGroup.length
         <div style={{ fontSize: 11, color: C.muted, marginTop: 4 }}>
   Saved automatically
 </div>
+            </div>
         </div>
       ))}
   </div>
