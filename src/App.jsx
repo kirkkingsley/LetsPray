@@ -1107,9 +1107,7 @@ setPeople(prev => [...prev, {
 
   function addRequest(personId) {
     if (!reqText.trim()) return;
-    setPeople(prev =>setPeople(prev => prev.map(p => p.id === personId ? { ...p, prayerRequests: [...(p.prayerRequests || []), { text: reqText.trim(), status: "active", createdAt: Date.now() }], updatedAt: Date.now() } : p));
-    setReqText(""); setReqFor(null);
-  }
+setPeople(prev => prev.map(p => p.id === personId ? { ...p, prayerRequests: [...(p.prayerRequests || []), { text: reqText.trim(), status: "active", createdAt: Date.now() }], updatedAt: Date.now() } : p));  }
 
   function removeRequest(personId, idx) {
     setPeople(prev => prev.map(p => p.id === personId ? { ...p, prayerRequests: p.prayerRequests.filter((_, i) => i !== idx), updatedAt: Date.now() } : p));
