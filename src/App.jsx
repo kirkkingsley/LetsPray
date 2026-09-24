@@ -997,9 +997,10 @@ const leaderFollowUps = leaderGroup.filter(
       const inSameWeek = p.prayedAt && p.prayedAt >= weekStart;
       const weekDateStr = getWeekDateStringET();
       const leaderPrayerDates = { ...(p.leaderPrayerDates || {}) };
-if (currentLeaderId) {
+ const leaderPrayerHistory = { ...(p.leaderPrayerHistory || {}) };
+           if (currentLeaderId) {
   leaderPrayerDates[currentLeaderId] = Date.now();
-  const leaderPrayerHistory = { ...(p.leaderPrayerHistory || {}) };
+ 
   leaderPrayerHistory[currentLeaderId] = [
   ...(leaderPrayerHistory[currentLeaderId] || []),
   Date.now()
