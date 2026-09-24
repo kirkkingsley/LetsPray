@@ -28,6 +28,8 @@ export async function onRequest(context) {
   status: ok ? 200 : 401,
   headers
 });
+    }
+  
   // Settings endpoint
   if (key === "settings") {
     if (request.method === "GET") {
