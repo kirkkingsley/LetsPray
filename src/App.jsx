@@ -1565,6 +1565,18 @@ function markRequestAnswered(personId, idx) {
                   {currentLeaderId && (current?.leaderPrayerHistory?.[currentLeaderId] || []).length > 0 && (
   <div style={S.reqBox}>
     <p style={S.reqLabel}>Prayer History</p>
+    {(current.leaderPrayerHistory?.[currentLeaderId] || [])
+  .slice()
+  .reverse()
+  .map((date, i) => (
+    <div key={i} style={S.weekMeta}>
+      {new Date(date).toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric"
+      })}
+    </div>
+  ))}
   </div>
 )}
 
