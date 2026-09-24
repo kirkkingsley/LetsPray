@@ -18,6 +18,16 @@ export async function onRequest(context) {
   const url = new URL(request.url);
   const key = url.searchParams.get("key") || "people";
 
+ // Admin authentication endpoint
+  if (key === "auth" && request.method === "POST") {
+    const body = await request.json();
+    const raw = await env.INTERCEDE_KV.get("settings");
+    const settings = raw ? JSON.parse(raw) : {};
+    const ok = body.password === settings.password;
+    return new Response(JSON.stringify({ ok }), {
+  status: ok ? 200 : 401,
+  headers
+});
   // Settings endpoint
   if (key === "settings") {
     if (request.method === "GET") {
