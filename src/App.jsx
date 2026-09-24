@@ -1562,6 +1562,11 @@ function markRequestAnswered(personId, idx) {
                       )}
                     </div>
                   </div>
+                  {currentLeaderId && (current?.leaderPrayerHistory?.[currentLeaderId] || []).length > 0 && (
+  <div style={S.reqBox}>
+    <p style={S.reqLabel}>Prayer History</p>
+  </div>
+)}
 
                   <div style={S.navRow}>
                     <button onClick={() => navWithAnim(-1)} style={S.navArrow}><ChevronLeft size={22} /></button>
