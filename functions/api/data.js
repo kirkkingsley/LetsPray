@@ -30,23 +30,46 @@ export async function onRequest(context) {
 });
     }
   
-  // Settings endpoint
-  if (key === "settings") {
-    if (request.method === "GET") {
-      const data = await env.INTERCEDE_KV.get("settings");
-      return new Response(data || "null", { headers });
+// Settings endpoint
+if (key === "settings") {
+  if (request.method === "GET") {
+    const data = await env.INTERCEDE_KV.get("settings");
+
+    if (!data) {
+      return new Response("null", { headers });
     }
-    if (request.method === "POST") {
-      const body = await request.text();
-      try {
-        const parsed = JSON.parse(body);
-        await env.INTERCEDE_KV.put("settings", JSON.stringify(parsed));
-        return new Response(JSON.stringify({ ok: true }), { headers });
-      } catch (_e) {
-        return new Response(JSON.stringify({ error: "Invalid JSON" }), { status: 400, headers });
-      }
+
+    const settings = JSON.parse(data);
+    const { password, ...publicSettings } = settings;
+
+    return new Response(JSON.stringify(publicSettings), { headers });
+  }
+
+  if (request.method === "POST") {
+    const body = await request.text();
+
+    try {
+      const parsed = JSON.parse(body);
+
+      const existingRaw = await env.INTERCEDE_KV.get("settings");
+      const existing = existingRaw ? JSON.parse(existingRaw) : {};
+
+      const merged = {
+        ...existing,
+        ...parsed,
+      };
+
+      await env.INTERCEDE_KV.put("settings", JSON.stringify(merged));
+
+      return new Response(JSON.stringify({ ok: true }), { headers });
+    } catch (_e) {
+      return new Response(
+        JSON.stringify({ error: "Invalid JSON" }),
+        { status: 400, headers }
+      );
     }
   }
+}
 
   // People endpoint (default)
   if (request.method === "GET") {
