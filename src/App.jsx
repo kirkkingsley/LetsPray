@@ -592,6 +592,7 @@ function AppMain({ settings }) {
   const [addGroup, setAddGroup] = useState("hs");
   const [addSmallGroupLeader, setAddSmallGroupLeader] = useState("");
   const [currentLeaderId, setCurrentLeaderId] = useState(() => localStorage.getItem("letspray-current-leader") || "");
+  const [weeklyPrayerFocus, setWeeklyPrayerFocus] = useState(() => localStorage.getItem("letspray-weekly-focus") || "");
   const [search, setSearch] = useState("");
   const [editBdayFor, setEditBdayFor] = useState(null);
   const [editNameFor, setEditNameFor] = useState(null);
@@ -1090,6 +1091,10 @@ function toggleFollowUp(personId) {
   } else {
     localStorage.removeItem("letspray-current-leader");
   }
+}
+  function saveWeeklyPrayerFocus(value) {
+  setWeeklyPrayerFocus(value);
+  localStorage.setItem("letspray-weekly-focus", value);
 }
   function addPerson() {
     if (!addName.trim()) return;
@@ -1970,6 +1975,18 @@ width: `${leaderGroup.length ? (leaderPrayedThisWeek.length / leaderGroup.length
       {/* ─── PEOPLE ─── */}
       {view === "people" && (
         <div style={S.peopleWrap}>
+          <div style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:14, padding:"14px", marginBottom:14 }}>
+            <p style={{ margin:0, fontSize:11, color:C.muted, textTransform:"uppercase", letterSpacing:"0.06em", fontWeight:600 }}>
+  Pray Together This Week
+</p>
+            <textarea
+  value={weeklyPrayerFocus}
+  onChange={e => saveWeeklyPrayerFocus(e.target.value)}
+  placeholder="Enter this week's ministry-wide prayer focus..."
+  rows={3}
+  style={{ ...S.reqInput, width:"100%", marginTop:10, resize:"vertical" }}
+/>
+            </div>
           {/* ── Add person form ── */}
           <div style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:14, padding:"14px", display:"flex", flexDirection:"column", gap:8, marginBottom:4 }}>
             <p style={{ margin:0, fontSize:11, color:C.muted, textTransform:"uppercase", letterSpacing:"0.06em", fontWeight:600 }}>Add Person</p>
