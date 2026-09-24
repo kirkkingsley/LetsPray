@@ -1283,9 +1283,16 @@ function markRequestAnswered(personId, idx) {
     await apiSaveHistory(newHistory);
   }
 
-  function submitAdminPw() {
-    if (adminPwInput === ADMIN_PASSWORD) {
-      setAdminAuthed(true);
+async function submitAdminPw() {
+  try {
+    const res = await fetch("/api/data?key=auth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: adminPwInput }),
+    });
+
+    if (res.ok) {
+      setAdminAuthed();
       setAdminAuthedState(true);
       setShowAdminPrompt(false);
       if (pendingView) { setView(pendingView); setPendingView(null); }
@@ -1293,7 +1300,10 @@ function markRequestAnswered(personId, idx) {
       setAdminPwError("Incorrect password.");
       setAdminPwInput("");
     }
+  } catch (_e) {
+    setAdminPwError("Unable to verify password.");
   }
+}
 
   if (!loaded) {
     return <div style={S.root}><p style={{ color: C.cream, fontFamily: "Lora, Georgia, serif", textAlign: "center", marginTop: 80, fontSize: 20 }}>Loading…</p></div>;
