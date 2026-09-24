@@ -1001,10 +1001,15 @@ const leaderFollowUps = leaderGroup.filter(
            if (currentLeaderId) {
   leaderPrayerDates[currentLeaderId] = Date.now();
  
+const existingHistory = leaderPrayerHistory[currentLeaderId] || [];
+const today = new Date().toDateString();
+
+if (!existingHistory.some(date => new Date(date).toDateString() === today)) {
   leaderPrayerHistory[currentLeaderId] = [
-  ...(leaderPrayerHistory[currentLeaderId] || []),
-  Date.now()
-];
+    ...existingHistory,
+    Date.now()
+  ];
+} 
 }
       return { ...p, leaderPrayerDates, leaderPrayerHistory, prayedAt: Date.now(), prayedWeek: weekStart, prayedWeekDate: weekDateStr, prayCount: (p.prayCount || 0) + 1, weekPrayCount: inSameWeek ? (p.weekPrayCount || 1) + 1 : 1, updatedAt: Date.now() };
     }));
