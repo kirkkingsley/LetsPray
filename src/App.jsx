@@ -563,6 +563,7 @@ export default function App() {
 }
 
 function AppMain({ settings }) {
+  const WEEKLY_PRAYER_FOCUS = settings.weeklyPrayerFocus || "";
   const ADMIN_PASSWORD = settings.password;
   const MINISTRY_NAME = settings.name;
   const MINISTRY_SUB = settings.sub || "";
@@ -592,8 +593,7 @@ function AppMain({ settings }) {
   const [addGroup, setAddGroup] = useState("hs");
   const [addSmallGroupLeader, setAddSmallGroupLeader] = useState("");
   const [currentLeaderId, setCurrentLeaderId] = useState(() => localStorage.getItem("letspray-current-leader") || "");
-  const [weeklyPrayerFocus, setWeeklyPrayerFocus] = useState(() => localStorage.getItem("letspray-weekly-focus") || "");
-  const [search, setSearch] = useState("");
+const [weeklyPrayerFocus, setWeeklyPrayerFocus] = useState(WEEKLY_PRAYER_FOCUS);  const [search, setSearch] = useState("");
   const [editBdayFor, setEditBdayFor] = useState(null);
   const [editNameFor, setEditNameFor] = useState(null);
   const [nameInput, setNameInput] = useState("");
@@ -1094,7 +1094,7 @@ function toggleFollowUp(personId) {
 }
   function saveWeeklyPrayerFocus(value) {
   setWeeklyPrayerFocus(value);
-  localStorage.setItem("letspray-weekly-focus", value);
+  apiSaveSettings({ ...settings, weeklyPrayerFocus: value });
 }
   function addPerson() {
     if (!addName.trim()) return;
