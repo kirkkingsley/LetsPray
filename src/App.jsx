@@ -999,8 +999,13 @@ const leaderFollowUps = leaderGroup.filter(
       const leaderPrayerDates = { ...(p.leaderPrayerDates || {}) };
 if (currentLeaderId) {
   leaderPrayerDates[currentLeaderId] = Date.now();
+  const leaderPrayerHistory = { ...(p.leaderPrayerHistory || {}) };
+  leaderPrayerHistory[currentLeaderId] = [
+  ...(leaderPrayerHistory[currentLeaderId] || []),
+  Date.now()
+];
 }
-      return { ...p, leaderPrayerDates, prayedAt: Date.now(), prayedWeek: weekStart, prayedWeekDate: weekDateStr, prayCount: (p.prayCount || 0) + 1, weekPrayCount: inSameWeek ? (p.weekPrayCount || 1) + 1 : 1, updatedAt: Date.now() };
+      return { ...p, leaderPrayerDates, leaderPrayerHistory, prayedAt: Date.now(), prayedWeek: weekStart, prayedWeekDate: weekDateStr, prayCount: (p.prayCount || 0) + 1, weekPrayCount: inSameWeek ? (p.weekPrayCount || 1) + 1 : 1, updatedAt: Date.now() };
     }));
     if (current?.id) dismissBday(current.id);
     setPinnedPersonId(null);
