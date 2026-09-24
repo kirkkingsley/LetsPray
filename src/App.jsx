@@ -1687,6 +1687,35 @@ function markRequestAnswered(personId, idx) {
     ? `${people.find(p => p.id === currentLeaderId)?.name || "Leader"} · ${people.filter(p => p.active !== false && p.type === "student" && p.smallGroupLeader === currentLeaderId).length} students`
     : "Select yourself on the Pray tab to view your small group."}
 </p>
+    {weeklyPrayerFocus.trim() && (
+    <div style={{
+  background: C.surface,
+  border: `1px solid ${C.prayedGreen}`,
+  borderRadius: 14,
+  padding: "14px 16px",
+  marginBottom: 18
+}}>
+      <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8 }}>
+  <span style={{ fontSize:20 }}>🙏</span>
+  <span style={{
+    fontSize:11,
+    color:C.prayedGreen,
+    textTransform:"uppercase",
+    letterSpacing:"0.08em",
+    fontWeight:700
+  }}>
+    Pray Together This Week
+  </span>
+</div>
+      <div style={{
+  fontSize:15,
+  lineHeight:1.5,
+  color:C.text
+}}>
+  {weeklyPrayerFocus}
+</div>
+      </div>
+)}
     <div style={{ marginBottom: 14, fontSize: 14, color: C.cream }}>
   {people.filter(p =>
     p.active !== false &&
