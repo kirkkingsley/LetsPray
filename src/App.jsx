@@ -55,11 +55,12 @@ async function apiLoadSettings() {
 }
 
 async function apiSaveSettings(settings) {
-  await fetch("/api/data?key=settings", {
+const res = await fetch("/api/data?key=settings", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(settings),
   });
+  if (!res.ok) throw new Error(`settings save failed: ${res.status}`);
 }
 
 async function apiLoad() {
