@@ -2251,7 +2251,10 @@ width: `${leaderGroup.length ? (leaderPrayedThisWeek.length / leaderGroup.length
   data-lpignore="true"
   data-form-type="other"
   value={search}
-  onChange={e => setSearch(e.target.value)}
+ onChange={e => {
+  const value = e.target.value;
+  setSearch(value === "Let's Pray" ? "" : value);
+}}
   placeholder="Search people…"
   style={{ ...S.addInput, marginBottom: 4 }}
 />
