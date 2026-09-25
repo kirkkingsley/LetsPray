@@ -161,11 +161,18 @@ if (!authorized) {
   }
 }
 
-  // People endpoint (default)
-  if (request.method === "GET") {
-    const data = await env.INTERCEDE_KV.get("people");
-    return new Response(data || "[]", { headers });
-  }
+ // People endpoint (default)
+if (request.method === "GET") {
+  const data = await env.INTERCEDE_KV.get("people");
+  const people = data ? JSON.parse(data) : [];
+
+  const publicPeople = people.map(person => {
+    const { pin, ...safePerson } = person;
+    return safePerson;
+  });
+
+  return new Response(JSON.stringify(publicPeople), { headers });
+}
 
   if (request.method === "POST") {
     const body = await request.text();
@@ -203,11 +210,19 @@ if (!authorized) {
     const storedMap = Object.fromEntries(stored.map(p => [p.id, p]));
     const incomingIds = new Set(incoming.map(p => p.id));
 
-    const merged = incoming.map(p => {
-      const s = storedMap[p.id];
-      if (!s) return p;
-      return (p.updatedAt || 0) >= (s.updatedAt || 0) ? p : s;
-    });
+const merged = incoming.map(p => {
+  const s = storedMap[p.id];
+  if (!s) return p;
+
+  if ((p.updatedAt || 0) >= (s.updatedAt || 0)) {
+    return {
+      ...p,
+      ...(s.pin ? { pin: s.pin } : {}),
+    };
+  }
+
+  return s;
+});
 
     for (const s of stored) {
       if (!incomingIds.has(s.id)) merged.push(s);
