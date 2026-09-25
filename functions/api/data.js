@@ -18,7 +18,51 @@ export async function onRequest(context) {
   const url = new URL(request.url);
   const key = url.searchParams.get("key") || "people";
 
-// Admin authentication endpoint
+
+  
+  // Leader authentication endpoint
+if (key === "leader-auth" && request.method === "POST") {
+  const body = await request.json();
+  const leaderId = body.leaderId;
+  const pin = String(body.pin || "");
+
+  const raw = await env.INTERCEDE_KV.get("people");
+  const people = raw ? JSON.parse(raw) : [];
+
+  const leader = people.find(
+    p => p.id === leaderId &&
+         p.type === "leader" &&
+         p.active !== false
+  );
+
+  if (!leader || !leader.pin || String(leader.pin) !== pin) {
+    return new Response(JSON.stringify({ ok: false }), {
+      status: 401,
+      headers
+    });
+  }
+
+  const token = crypto.randomUUID();
+  const expiresAt = Date.now() + (30 * 24 * 60 * 60 * 1000);
+
+  await env.INTERCEDE_KV.put(
+    `leader_session:${token}`,
+    JSON.stringify({
+      leaderId: leader.id,
+      expiresAt
+    }),
+    { expirationTtl: 2592000 }
+  );
+
+  return new Response(JSON.stringify({
+    ok: true,
+    token,
+    leaderId: leader.id
+  }), {
+    status: 200,
+    headers
+  });
+}// Admin authentication endpoint
 if (key === "auth" && request.method === "POST") {
   const body = await request.json();
   const raw = await env.INTERCEDE_KV.get("settings");
