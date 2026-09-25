@@ -1122,7 +1122,13 @@ setPeople(prev => [...prev, {
     setAddGrade(""); 
     setAddSmallGroupLeader("");
   }
-
+function saveLeaderPin(id, pin) {
+  setPeople(prev => prev.map(p =>
+    p.id === id
+      ? { ...p, pin: pin.trim(), updatedAt: Date.now() }
+      : p
+  ));
+}
   function cycleGroup(id) {
     setPeople(prev => prev.map(p => {
       if (p.id !== id) return p;
@@ -2203,6 +2209,24 @@ width: `${leaderGroup.length ? (leaderPrayedThisWeek.length / leaderGroup.length
                     {p.birthday && <button onClick={() => saveBirthday(p.id, "")} style={S.reqCancelBtn} title="Clear"><X size={12} /></button>}
                   </div>
                 )}
+
+                {p.type === "leader" && (
+  <div style={S.gradeRow}>
+    <span style={S.gradeLabel}>Leader PIN</span>
+    <input
+      type="text"
+      inputMode="numeric"
+      maxLength={4}
+      value={p.pin || ""}
+      onChange={e => {
+        const pin = e.target.value.replace(/\D/g, "").slice(0, 4);
+        saveLeaderPin(p.id, pin);
+      }}
+      placeholder="4-digit PIN"
+      style={{ ...S.gradeSelect, width: 110 }}
+    />
+  </div>
+)}
               {p.type === "student" && (
   <>
     <div style={S.gradeRow}>
