@@ -1292,6 +1292,12 @@ async function submitAdminPw() {
     });
 
     if (res.ok) {
+      const data = await res.json();
+
+      if (data.token) {
+        localStorage.setItem("adminSessionToken", data.token);
+      }
+
       setAdminAuthed();
       setAdminAuthedState(true);
       setShowAdminPrompt(false);
@@ -1304,7 +1310,6 @@ async function submitAdminPw() {
     setAdminPwError("Unable to verify password.");
   }
 }
-
   if (!loaded) {
     return <div style={S.root}><p style={{ color: C.cream, fontFamily: "Lora, Georgia, serif", textAlign: "center", marginTop: 80, fontSize: 20 }}>Loading…</p></div>;
   }
