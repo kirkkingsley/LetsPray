@@ -621,6 +621,12 @@ const [weeklyPrayerFocus, setWeeklyPrayerFocus] = useState(WEEKLY_PRAYER_FOCUS);
   const pollTimer = useRef(null);
   const isSaving = useRef(false);
 
+  // Leader auth
+const [showLeaderPinPrompt, setShowLeaderPinPrompt] = useState(false);
+const [leaderPinInput, setLeaderPinInput] = useState("");
+const [leaderPinError, setLeaderPinError] = useState("");
+const [pendingLeaderId, setPendingLeaderId] = useState(null);
+  
   // Admin auth
   const [adminAuthed, setAdminAuthedState] = useState(() => isAdminAuthed());
   const [showAdminPrompt, setShowAdminPrompt] = useState(false);
@@ -1089,14 +1095,63 @@ function toggleFollowUp(personId) {
   const [rosterGroup, setRosterGroup] = useState("all"); // all | ms | hs | leader
   const [rosterSort, setRosterSort] = useState("name"); // name | grade | birthday
 
-  function chooseCurrentLeader(leaderId) {
-  setCurrentLeaderId(leaderId);
-    if (leaderId) setFilter("my-group");
-
-  if (leaderId) {
-    localStorage.setItem("letspray-current-leader", leaderId);
-  } else {
+function chooseCurrentLeader(leaderId) {
+  if (!leaderId) {
+    setCurrentLeaderId("");
     localStorage.removeItem("letspray-current-leader");
+    localStorage.removeItem("leaderSessionToken");
+    localStorage.removeItem("leaderSessionLeaderId");
+    return;
+  }
+
+  const savedToken = localStorage.getItem("leaderSessionToken");
+  const savedLeaderId = localStorage.getItem("leaderSessionLeaderId");
+
+  if (savedToken && savedLeaderId === leaderId) {
+    setCurrentLeaderId(leaderId);
+    setFilter("my-group");
+    localStorage.setItem("letspray-current-leader", leaderId);
+    return;
+  }
+
+  setPendingLeaderId(leaderId);
+  setLeaderPinInput("");
+  setLeaderPinError("");
+  setShowLeaderPinPrompt(true);
+}
+  async function submitLeaderPin() {
+  if (!pendingLeaderId) return;
+
+  try {
+    const res = await fetch("/api/data?key=leader-auth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        leaderId: pendingLeaderId,
+        pin: leaderPinInput
+      }),
+    });
+
+    if (!res.ok) {
+      setLeaderPinError("Incorrect PIN.");
+      setLeaderPinInput("");
+      return;
+    }
+
+    const data = await res.json();
+
+    localStorage.setItem("leaderSessionToken", data.token);
+    localStorage.setItem("leaderSessionLeaderId", data.leaderId);
+    localStorage.setItem("letspray-current-leader", data.leaderId);
+
+    setCurrentLeaderId(data.leaderId);
+    setFilter("my-group");
+    setShowLeaderPinPrompt(false);
+    setPendingLeaderId(null);
+    setLeaderPinInput("");
+    setLeaderPinError("");
+  } catch (_e) {
+    setLeaderPinError("Unable to verify PIN.");
   }
 }
   function saveWeeklyPrayerFocus(value) {
@@ -1385,7 +1440,46 @@ async function submitAdminPw() {
           </div>
         </div>
       )}
+{/* Leader PIN modal */}
+{showLeaderPinPrompt && (
+  <div style={S.modalOverlay} onClick={() => setShowLeaderPinPrompt(false)}>
+    <div style={S.modalBox} onClick={e => e.stopPropagation()}>
+      <p style={S.modalTitle}>Leader Access</p>
 
+      <input
+        autoFocus
+        type="password"
+        inputMode="numeric"
+        maxLength={4}
+        value={leaderPinInput}
+        onChange={e => {
+          const pin = e.target.value.replace(/\D/g, "").slice(0, 4);
+          setLeaderPinInput(pin);
+        }}
+        onKeyDown={e => {
+          if (e.key === "Enter") submitLeaderPin();
+          if (e.key === "Escape") setShowLeaderPinPrompt(false);
+        }}
+        placeholder="4-digit PIN"
+        style={S.modalInput}
+      />
+
+      {leaderPinError && <p style={S.modalError}>{leaderPinError}</p>}
+
+      <div style={S.modalBtns}>
+        <button onClick={submitLeaderPin} style={S.confirmBtn}>
+          Unlock
+        </button>
+        <button
+          onClick={() => setShowLeaderPinPrompt(false)}
+          style={S.cancelBtn}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       {/* ─── PRAY ─── */}
       {view === "pray" && (
         <div style={S.prayWrap}>
