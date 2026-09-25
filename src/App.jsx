@@ -55,11 +55,17 @@ async function apiLoadSettings() {
 }
 
 async function apiSaveSettings(settings) {
-const res = await fetch("/api/data?key=settings", {
+  const token = localStorage.getItem("adminSessionToken");
+
+  const res = await fetch("/api/data?key=settings", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    },
     body: JSON.stringify(settings),
   });
+
   if (!res.ok) throw new Error(`settings save failed: ${res.status}`);
 }
 
