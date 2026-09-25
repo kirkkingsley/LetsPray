@@ -2244,7 +2244,15 @@ width: `${leaderGroup.length ? (leaderPrayedThisWeek.length / leaderGroup.length
               </button>
             ))}
           </div>
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search people…" style={{ ...S.addInput, marginBottom: 4 }} />
+         <input
+  type="search"
+  name="people-search"
+  autoComplete="off"
+  value={search}
+  onChange={e => setSearch(e.target.value)}
+  placeholder="Search people…"
+  style={{ ...S.addInput, marginBottom: 4 }}
+/>
           <div style={{ display:"flex", gap:16, marginBottom:10, justifyContent:"center" }}>
             {[["name","A–Z"],["group","MS/HS"],["grade","Grade"],["birthday","Birthday"]].map(([val, label]) => (
               <button key={val} onClick={() => setPeopleSort(val)} style={{ background:"none", border:"none", borderBottom: peopleSort === val ? `2px solid ${C.accent}` : "2px solid transparent", color: peopleSort === val ? C.cream : C.muted, fontSize:13, fontWeight: peopleSort === val ? 500 : 400, padding:"2px 0", cursor:"pointer", fontFamily:"'Inter', system-ui, sans-serif", transition:"color 0.15s" }}>
