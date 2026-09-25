@@ -84,6 +84,14 @@ if (key === "settings") {
   }
 
   if (request.method === "POST") {
+    const authorized = await isValidAdminSession();
+
+if (!authorized) {
+  return new Response(JSON.stringify({ error: "Unauthorized" }), {
+    status: 401,
+    headers
+  });
+}
     const body = await request.text();
 
     try {
