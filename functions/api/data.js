@@ -62,7 +62,59 @@ if (key === "leader-auth" && request.method === "POST") {
     status: 200,
     headers
   });
-}// Admin authentication endpoint
+}
+// Admin-only leader PIN endpoint
+if (key === "leader-pin" && request.method === "POST") {
+  const authorized = await isValidAdminSession();
+
+  if (!authorized) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers
+    });
+  }
+
+  const body = await request.json();
+  const leaderId = body.leaderId;
+  const pin = String(body.pin || "").trim();
+
+  if (!leaderId || !/^\d{4}$/.test(pin)) {
+    return new Response(JSON.stringify({ error: "Invalid leader or PIN" }), {
+      status: 400,
+      headers
+    });
+  }
+
+  const raw = await env.INTERCEDE_KV.get("people");
+  const people = raw ? JSON.parse(raw) : [];
+
+  const leaderIndex = people.findIndex(
+    p => p.id === leaderId &&
+         p.type === "leader" &&
+         p.active !== false
+  );
+
+  if (leaderIndex === -1) {
+    return new Response(JSON.stringify({ error: "Leader not found" }), {
+      status: 404,
+      headers
+    });
+  }
+
+  people[leaderIndex] = {
+    ...people[leaderIndex],
+    pin,
+    updatedAt: Date.now()
+  };
+
+  await env.INTERCEDE_KV.put("people", JSON.stringify(people));
+
+  return new Response(JSON.stringify({ ok: true }), {
+    status: 200,
+    headers
+  });
+}  
+  // Admin authentication endpoint
 if (key === "auth" && request.method === "POST") {
   const body = await request.json();
   const raw = await env.INTERCEDE_KV.get("settings");
