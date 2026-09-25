@@ -599,6 +599,7 @@ function AppMain({ settings }) {
   const [addType, setAddType] = useState("student");
   const [addGroup, setAddGroup] = useState("hs");
   const [addSmallGroupLeader, setAddSmallGroupLeader] = useState("");
+  const [leaderPinDrafts, setLeaderPinDrafts] = useState({});
   const [currentLeaderId, setCurrentLeaderId] = useState(() => localStorage.getItem("letspray-current-leader") || "");
 const [weeklyPrayerFocus, setWeeklyPrayerFocus] = useState(WEEKLY_PRAYER_FOCUS);  const [search, setSearch] = useState("");
   const [editBdayFor, setEditBdayFor] = useState(null);
@@ -1177,12 +1178,32 @@ setPeople(prev => [...prev, {
     setAddGrade(""); 
     setAddSmallGroupLeader("");
   }
-function saveLeaderPin(id, pin) {
-  setPeople(prev => prev.map(p =>
-    p.id === id
-      ? { ...p, pin: pin.trim(), updatedAt: Date.now() }
-      : p
-  ));
+async function saveLeaderPin(id, pin) {
+  const cleanPin = pin.trim();
+
+  if (!/^\d{4}$/.test(cleanPin)) return;
+
+  const token = localStorage.getItem("adminSessionToken");
+
+  try {
+    const res = await fetch("/api/data?key=leader-pin", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({
+        leaderId: id,
+        pin: cleanPin
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error(`PIN save failed: ${res.status}`);
+    }
+  } catch (_e) {
+    alert("Unable to save leader PIN.");
+  }
 }
   function cycleGroup(id) {
     setPeople(prev => prev.map(p => {
@@ -2304,21 +2325,46 @@ width: `${leaderGroup.length ? (leaderPrayedThisWeek.length / leaderGroup.length
                   </div>
                 )}
 
-                {p.type === "leader" && (
+{p.type === "leader" && (
   <div style={S.gradeRow}>
     <span style={S.gradeLabel}>Leader PIN</span>
+
     <input
-      type="text"
+      type="password"
       inputMode="numeric"
       maxLength={4}
-      value={p.pin || ""}
+      value={leaderPinDrafts[p.id] || ""}
       onChange={e => {
         const pin = e.target.value.replace(/\D/g, "").slice(0, 4);
-        saveLeaderPin(p.id, pin);
+        setLeaderPinDrafts(prev => ({
+          ...prev,
+          [p.id]: pin
+        }));
       }}
-      placeholder="4-digit PIN"
-      style={{ ...S.gradeSelect, width: 110 }}
+      placeholder="New PIN"
+      style={{ ...S.gradeSelect, width: 90 }}
     />
+
+    <button
+      onClick={async () => {
+        const pin = leaderPinDrafts[p.id] || "";
+
+        if (pin.length !== 4) {
+          alert("Enter a 4-digit PIN.");
+          return;
+        }
+
+        await saveLeaderPin(p.id, pin);
+
+        setLeaderPinDrafts(prev => ({
+          ...prev,
+          [p.id]: ""
+        }));
+      }}
+      style={S.smallBtn}
+    >
+      Set PIN
+    </button>
   </div>
 )}
               {p.type === "student" && (
