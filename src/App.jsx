@@ -2244,10 +2244,12 @@ width: `${leaderGroup.length ? (leaderPrayedThisWeek.length / leaderGroup.length
               </button>
             ))}
           </div>
-         <input
+       <input
   type="search"
-  name="people-search"
-  autoComplete="off"
+  name="people-filter-query"
+  autoComplete="new-password"
+  data-lpignore="true"
+  data-form-type="other"
   value={search}
   onChange={e => setSearch(e.target.value)}
   placeholder="Search people…"
