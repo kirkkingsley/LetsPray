@@ -40,7 +40,11 @@ if (key === "auth" && request.method === "POST") {
     JSON.stringify({ expiresAt }),
     { expirationTtl: 43200 }
   );
-
+return new Response(JSON.stringify({ ok: true, token }), {
+  status: 200,
+  headers
+});
+}
 // Verify admin session token
 async function isValidAdminSession() {
   const token = request.headers.get("Authorization")?.replace("Bearer ", "");
