@@ -18,17 +18,34 @@ export async function onRequest(context) {
   const url = new URL(request.url);
   const key = url.searchParams.get("key") || "people";
 
- // Admin authentication endpoint
-  if (key === "auth" && request.method === "POST") {
-    const body = await request.json();
-    const raw = await env.INTERCEDE_KV.get("settings");
-    const settings = raw ? JSON.parse(raw) : {};
-    const ok = body.password === settings.password;
-    return new Response(JSON.stringify({ ok }), {
-  status: ok ? 200 : 401,
-  headers
-});
-    }
+// Admin authentication endpoint
+if (key === "auth" && request.method === "POST") {
+  const body = await request.json();
+  const raw = await env.INTERCEDE_KV.get("settings");
+  const settings = raw ? JSON.parse(raw) : {};
+  const ok = body.password === settings.password;
+
+  if (!ok) {
+    return new Response(JSON.stringify({ ok: false }), {
+      status: 401,
+      headers
+    });
+  }
+
+  const token = crypto.randomUUID();
+  const expiresAt = Date.now() + (12 * 60 * 60 * 1000);
+
+  await env.INTERCEDE_KV.put(
+    `admin_session:${token}`,
+    JSON.stringify({ expiresAt }),
+    { expirationTtl: 43200 }
+  );
+
+  return new Response(JSON.stringify({ ok: true, token }), {
+    status: 200,
+    headers
+  });
+}
   
 // Settings endpoint
 if (key === "settings") {
