@@ -41,10 +41,27 @@ if (key === "auth" && request.method === "POST") {
     { expirationTtl: 43200 }
   );
 
-  return new Response(JSON.stringify({ ok: true, token }), {
-    status: 200,
-    headers
-  });
+// Verify admin session token
+async function isValidAdminSession() {
+  const token = request.headers.get("Authorization")?.replace("Bearer ", "");
+
+  if (!token) return false;
+
+  const raw = await env.INTERCEDE_KV.get(`admin_session:${token}`);
+  if (!raw) return false;
+
+  try {
+    const session = JSON.parse(raw);
+
+    if (!session.expiresAt || Date.now() > session.expiresAt) {
+      await env.INTERCEDE_KV.delete(`admin_session:${token}`);
+      return false;
+    }
+
+    return true;
+  } catch (_e) {
+    return false;
+  }
 }
   
 // Settings endpoint
