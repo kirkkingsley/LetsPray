@@ -5,7 +5,7 @@ export async function onRequest(context) {
     "Content-Type": "application/json",
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
+   "Access-Control-Allow-Headers": "Content-Type, Authorization",
     "Cache-Control": "no-store, no-cache, must-revalidate",
   };
 
@@ -163,6 +163,31 @@ async function isValidAdminSession() {
     return false;
   }
 }
+async function getValidLeaderSession() {
+  const token = request.headers.get("Authorization")?.replace("Bearer ", "");
+
+  if (!token) return null;
+
+  const raw = await env.INTERCEDE_KV.get(`leader_session:${token}`);
+  if (!raw) return null;
+
+  try {
+    const session = JSON.parse(raw);
+
+    if (
+      !session.leaderId ||
+      !session.expiresAt ||
+      Date.now() > session.expiresAt
+    ) {
+      await env.INTERCEDE_KV.delete(`leader_session:${token}`);
+      return null;
+    }
+
+    return session;
+  } catch (_e) {
+    return null;
+  }
+}
   
 // Settings endpoint
 if (key === "settings") {
@@ -227,6 +252,17 @@ if (request.method === "GET") {
 }
 
   if (request.method === "POST") {
+    const adminAuthorized = await isValidAdminSession();
+const leaderSession = adminAuthorized
+  ? null
+  : await getValidLeaderSession();
+
+if (!adminAuthorized && !leaderSession) {
+  return new Response(JSON.stringify({ error: "Unauthorized" }), {
+    status: 401,
+    headers
+  });
+}
     const body = await request.text();
     let incoming, force;
     try {
@@ -247,10 +283,21 @@ if (request.method === "GET") {
       return new Response(JSON.stringify({ error: "Refusing to store empty data" }), { status: 400, headers });
     }
 
-    if (force) {
-      await env.INTERCEDE_KV.put("people", JSON.stringify(incoming));
-      return new Response(JSON.stringify({ ok: true, count: incoming.length, forced: true }), { headers });
-    }
+   if (force) {
+  if (!adminAuthorized) {
+    return new Response(JSON.stringify({ error: "Admin authorization required" }), {
+      status: 403,
+      headers
+    });
+  }
+
+  await env.INTERCEDE_KV.put("people", JSON.stringify(incoming));
+
+  return new Response(
+    JSON.stringify({ ok: true, count: incoming.length, forced: true }),
+    { headers }
+  );
+}
 
     let stored = [];
     try {
