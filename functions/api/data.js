@@ -306,23 +306,76 @@ if (!adminAuthorized && !leaderSession) {
       if (!Array.isArray(stored)) stored = [];
     } catch (_e) { stored = []; }
 
-    const storedMap = Object.fromEntries(stored.map(p => [p.id, p]));
-    const incomingIds = new Set(incoming.map(p => p.id));
+   const storedMap = Object.fromEntries...
+const storedMap = Object.fromEntries(stored.map(p => [p.id, p]));
+const incomingIds = new Set(incoming.map(p => p.id));
 
 const merged = incoming.map(p => {
   const s = storedMap[p.id];
-  if (!s) return p;
 
-  if ((p.updatedAt || 0) >= (s.updatedAt || 0)) {
-    return {
-      ...p,
-      ...(s.pin ? { pin: s.pin } : {}),
-    };
+  // Admins can update the full record.
+  if (adminAuthorized) {
+    if (!s) return p;
+
+    if ((p.updatedAt || 0) >= (s.updatedAt || 0)) {
+      return {
+        ...p,
+        ...(s.pin ? { pin: s.pin } : {}),
+      };
+    }
+
+    return s;
   }
 
-  return s;
-});
+  // Leaders cannot create new people.
+  if (!s || !leaderSession) return s || null;
 
+  const leaderId = leaderSession.leaderId;
+
+  // A leader may only change their own leader-specific data.
+  const leaderPrayerDates = {
+    ...(s.leaderPrayerDates || {}),
+  };
+
+  const leaderPrayerHistory = {
+    ...(s.leaderPrayerHistory || {}),
+  };
+
+  const leaderFollowUps = {
+    ...(s.leaderFollowUps || {}),
+  };
+
+ if (p.leaderPrayerDates?.[leaderId] !== undefined) {
+  leaderPrayerDates[leaderId] = p.leaderPrayerDates[leaderId];
+} else {
+  delete leaderPrayerDates[leaderId];
+}
+
+if (p.leaderPrayerHistory?.[leaderId] !== undefined) {
+  leaderPrayerHistory[leaderId] = p.leaderPrayerHistory[leaderId];
+} else {
+  delete leaderPrayerHistory[leaderId];
+}
+  if (p.leaderFollowUps?.[leaderId] !== undefined) {
+    leaderFollowUps[leaderId] = p.leaderFollowUps[leaderId];
+  } else {
+    delete leaderFollowUps[leaderId];
+  }
+
+  return {
+    ...s,
+    leaderPrayerDates,
+    leaderPrayerHistory,
+    leaderFollowUps,
+
+    // Keep these legacy prayer fields working for now.
+    prayedAt: p.prayedAt,
+    prayedWeek: p.prayedWeek,
+    prayedWeekDate: p.prayedWeekDate,
+
+    updatedAt: Date.now(),
+  };
+}).filter(Boolean);
     for (const s of stored) {
       if (!incomingIds.has(s.id)) merged.push(s);
     }
