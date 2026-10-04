@@ -80,11 +80,23 @@ async function apiLoad() {
 
 async function apiSave(people, force = false) {
   if (!people || people.length === 0) return;
-  await fetch("/api/data", {
+
+  const adminToken = localStorage.getItem("adminSessionToken");
+  const leaderToken = localStorage.getItem("leaderSessionToken");
+  const token = adminToken || leaderToken;
+
+  const res = await fetch("/api/data", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    },
     body: JSON.stringify(force ? { data: people, force: true } : people),
   });
+
+  if (!res.ok) {
+    throw new Error(`People save failed: ${res.status}`);
+  }
 }
 
 
