@@ -1662,7 +1662,37 @@ async function submitAdminPw() {
   marginBottom: 14
 }}>
             <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8 }}>
-  <span style={{ fontSize:20 }}>🙏</span>
+ <span
+  style={{
+    width: 28,
+    height: 28,
+    borderRadius: "50%",
+    background: "rgba(111,174,132,0.12)",
+    border: `1px solid ${C.prayedGreen}`,
+    color: C.prayedGreen,
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  }}
+>
+  <svg
+    width="17"
+    height="17"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M9 11V4.5a1.5 1.5 0 0 1 3 0V11" />
+    <path d="M12 11V3.5a1.5 1.5 0 0 1 3 0V12" />
+    <path d="M15 12V6a1.5 1.5 0 0 1 3 0v8c0 4-2.5 7-6 7s-6-2.5-6-6v-4a1.5 1.5 0 0 1 3 0v2" />
+    <path d="M9 13V7a1.5 1.5 0 0 0-3 0v6" />
+  </svg>
+</span>
   <span style={{
     fontSize:11,
     color:C.prayedGreen,
