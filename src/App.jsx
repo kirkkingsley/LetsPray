@@ -1662,41 +1662,17 @@ async function submitAdminPw() {
   marginBottom: 14
 }}>
             <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8 }}>
- <span
+<img
+  src="/praying-hands.png"
+  alt=""
+  aria-hidden="true"
   style={{
-    width: 28,
-    height: 28,
-    borderRadius: "50%",
-    background: "rgba(111,174,132,0.12)",
-    border: `1px solid ${C.prayedGreen}`,
-    color: C.prayedGreen,
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
+    width: 30,
+    height: 30,
+    objectFit: "contain",
     flexShrink: 0,
   }}
->
- <svg
-  width="17"
-  height="17"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  strokeWidth="1.8"
-  strokeLinecap="round"
-  strokeLinejoin="round"
-  aria-hidden="true"
->
-  <path d="M12 3v8" />
-  <path d="M9.5 5.5 12 3l2.5 2.5" />
-  <path d="M8.5 8.5 12 12l3.5-3.5" />
-  <path d="M12 12 8 16.5" />
-  <path d="M12 12l4 4.5" />
-  <path d="M8 16.5 6.5 19" />
-  <path d="M16 16.5l1.5 2.5" />
-  <path d="M6.5 19h11" />
-</svg>
-</span>
+/>
   <span style={{
     fontSize:11,
     color:C.prayedGreen,
@@ -2127,7 +2103,17 @@ async function submitAdminPw() {
   marginBottom: 18
 }}>
       <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8 }}>
-  <span style={{ fontSize:20 }}>🙏</span>
+<img
+  src="/praying-hands.png"
+  alt=""
+  aria-hidden="true"
+  style={{
+    width: 30,
+    height: 30,
+    objectFit: "contain",
+    flexShrink: 0,
+  }}
+/>
   <span style={{
     fontSize:11,
     color:C.prayedGreen,
