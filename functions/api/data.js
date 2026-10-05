@@ -18,7 +18,111 @@ export async function onRequest(context) {
   const url = new URL(request.url);
   const key = url.searchParams.get("key") || "people";
 
+// Private leader notes endpoint
+if (key === "private-note") {
+  const token = request.headers.get("Authorization")?.replace("Bearer ", "");
 
+  if (!token) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers
+    });
+  }
+
+  const rawSession = await env.INTERCEDE_KV.get(`leader_session:${token}`);
+
+  if (!rawSession) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers
+    });
+  }
+
+  let session;
+
+  try {
+    session = JSON.parse(rawSession);
+
+    if (
+      !session.leaderId ||
+      !session.expiresAt ||
+      Date.now() > session.expiresAt
+    ) {
+      await env.INTERCEDE_KV.delete(`leader_session:${token}`);
+
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers
+      });
+    }
+  } catch (_e) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers
+    });
+  }
+
+  const studentId = url.searchParams.get("studentId");
+
+  if (!studentId) {
+    return new Response(JSON.stringify({ error: "Student required" }), {
+      status: 400,
+      headers
+    });
+  }
+
+  const rawPeople = await env.INTERCEDE_KV.get("people");
+const people = rawPeople ? JSON.parse(rawPeople) : [];
+
+const student = people.find(
+  p => p.id === studentId &&
+       p.type === "student" &&
+       p.active !== false &&
+       p.smallGroupLeader === session.leaderId
+);
+
+if (!student) {
+  return new Response(JSON.stringify({ error: "Student not found or not assigned to this leader" }), {
+    status: 404,
+    headers
+  });
+}
+  const noteKey = `private_note:${session.leaderId}:${studentId}`;
+
+  if (request.method === "GET") {
+    const note = await env.INTERCEDE_KV.get(noteKey);
+
+    return new Response(
+      JSON.stringify({ note: note || "" }),
+      { headers }
+    );
+  }
+
+  if (request.method === "POST") {
+    const body = await request.json();
+    const note = String(body.note || "").trim();
+if (note.length > 2000) {
+  return new Response(JSON.stringify({ error: "Note is too long" }), {
+    status: 400,
+    headers
+  });
+}
+    if (note) {
+      await env.INTERCEDE_KV.put(noteKey, note);
+    } else {
+      await env.INTERCEDE_KV.delete(noteKey);
+    }
+
+    return new Response(JSON.stringify({ ok: true }), {
+      headers
+    });
+  }
+
+  return new Response(JSON.stringify({ error: "Method not allowed" }), {
+    status: 405,
+    headers
+  });
+}
   
   // Leader authentication endpoint
 if (key === "leader-auth" && request.method === "POST") {
