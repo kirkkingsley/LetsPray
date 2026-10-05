@@ -81,9 +81,9 @@ async function apiLoad() {
 async function apiSave(people, force = false) {
   if (!people || people.length === 0) return;
 
-  const adminToken = localStorage.getItem("adminSessionToken");
-  const leaderToken = localStorage.getItem("leaderSessionToken");
-  const token = adminToken || leaderToken;
+ const adminToken = localStorage.getItem("adminSessionToken");
+const leaderToken = localStorage.getItem("leaderSessionToken");
+const token = adminToken || leaderToken;
 
   const res = await fetch("/api/data", {
     method: "POST",
@@ -2906,7 +2906,7 @@ width: `${leaderGroup.length ? (leaderPrayedThisWeek.length / leaderGroup.length
       {/* Admin footer link */}
       <div style={S.adminFooter}>
         {adminAuthed
-          ? <button onClick={() => { setAdminAuthedState(false); localStorage.removeItem(ADMIN_KEY); setView("pray"); }} style={S.adminLink}>lock admin</button>
+          ? <button onClick={() => { setAdminAuthedState(false); localStorage.removeItem(ADMIN_KEY); localStorage.removeItem("adminSessionToken"); setView("pray"); }} style={S.adminLink}>lock admin</button>
           : <button onClick={() => { setAdminPwInput(""); setAdminPwError(""); setShowAdminPrompt(true); }} style={S.adminLink}>admin</button>
         }
       </div>
