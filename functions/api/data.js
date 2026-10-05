@@ -434,7 +434,13 @@ const merged = incoming.map(p => {
   if (!s || !leaderSession) return s || null;
 
   const leaderId = leaderSession.leaderId;
-
+if (
+  s.type !== "student" ||
+  s.active === false ||
+  s.smallGroupLeader !== leaderId
+) {
+  return s;
+}
   // A leader may only change their own leader-specific data.
   const leaderPrayerDates = {
     ...(s.leaderPrayerDates || {}),
