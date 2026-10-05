@@ -410,7 +410,6 @@ if (!adminAuthorized && !leaderSession) {
       if (!Array.isArray(stored)) stored = [];
     } catch (_e) { stored = []; }
 
-   const storedMap = Object.fromEntries...
 const storedMap = Object.fromEntries(stored.map(p => [p.id, p]));
 const incomingIds = new Set(incoming.map(p => p.id));
 
