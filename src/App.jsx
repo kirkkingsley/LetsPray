@@ -1663,7 +1663,7 @@ async function submitAdminPw() {
 }}>
             <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8 }}>
 <img
-  src="/praying-hands.png"
+  src="/praying-hands.png.png"
   alt=""
   aria-hidden="true"
   style={{
@@ -2104,7 +2104,7 @@ async function submitAdminPw() {
 }}>
       <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8 }}>
 <img
-  src="/praying-hands.png"
+  src="/praying-hands.png.png"
   alt=""
   aria-hidden="true"
   style={{
