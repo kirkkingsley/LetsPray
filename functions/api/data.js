@@ -123,6 +123,56 @@ if (note.length > 2000) {
     headers
   });
 }
+// Validate an existing leader session
+if (key === "leader-session" && request.method === "GET") {
+  const token = request.headers.get("Authorization")?.replace("Bearer ", "");
+
+  if (!token) {
+    return new Response(JSON.stringify({ valid: false }), {
+      status: 401,
+      headers
+    });
+  }
+
+  const raw = await env.INTERCEDE_KV.get(`leader_session:${token}`);
+
+  if (!raw) {
+    return new Response(JSON.stringify({ valid: false }), {
+      status: 401,
+      headers
+    });
+  }
+
+  try {
+    const session = JSON.parse(raw);
+
+    if (
+      !session.leaderId ||
+      !session.expiresAt ||
+      Date.now() > session.expiresAt
+    ) {
+      await env.INTERCEDE_KV.delete(`leader_session:${token}`);
+
+      return new Response(JSON.stringify({ valid: false }), {
+        status: 401,
+        headers
+      });
+    }
+
+    return new Response(
+      JSON.stringify({
+        valid: true,
+        leaderId: session.leaderId
+      }),
+      { headers }
+    );
+  } catch (_e) {
+    return new Response(JSON.stringify({ valid: false }), {
+      status: 401,
+      headers
+    });
+  }
+}
   
   // Leader authentication endpoint
 if (key === "leader-auth" && request.method === "POST") {
