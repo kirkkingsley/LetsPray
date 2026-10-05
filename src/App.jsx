@@ -1676,22 +1676,26 @@ async function submitAdminPw() {
     flexShrink: 0,
   }}
 >
-  <svg
-    width="17"
-    height="17"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.8"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    <path d="M9 11V4.5a1.5 1.5 0 0 1 3 0V11" />
-    <path d="M12 11V3.5a1.5 1.5 0 0 1 3 0V12" />
-    <path d="M15 12V6a1.5 1.5 0 0 1 3 0v8c0 4-2.5 7-6 7s-6-2.5-6-6v-4a1.5 1.5 0 0 1 3 0v2" />
-    <path d="M9 13V7a1.5 1.5 0 0 0-3 0v6" />
-  </svg>
+ <svg
+  width="17"
+  height="17"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="1.8"
+  strokeLinecap="round"
+  strokeLinejoin="round"
+  aria-hidden="true"
+>
+  <path d="M12 3v8" />
+  <path d="M9.5 5.5 12 3l2.5 2.5" />
+  <path d="M8.5 8.5 12 12l3.5-3.5" />
+  <path d="M12 12 8 16.5" />
+  <path d="M12 12l4 4.5" />
+  <path d="M8 16.5 6.5 19" />
+  <path d="M16 16.5l1.5 2.5" />
+  <path d="M6.5 19h11" />
+</svg>
 </span>
   <span style={{
     fontSize:11,
