@@ -660,8 +660,7 @@ function AppMain({ settings }) {
 const [privateNoteStudentId, setPrivateNoteStudentId] = useState(null);
 const [privateNoteLoading, setPrivateNoteLoading] = useState(false);
 const [privateNoteStatus, setPrivateNoteStatus] = useState("");
-  const [currentLeaderId, setCurrentLeaderId] = useState(() => localStorage.getItem("letspray-current-leader") || "");
-const [weeklyPrayerFocus, setWeeklyPrayerFocus] = useState(WEEKLY_PRAYER_FOCUS);  const [search, setSearch] = useState("");
+const [currentLeaderId, setCurrentLeaderId] = useState("");const [weeklyPrayerFocus, setWeeklyPrayerFocus] = useState(WEEKLY_PRAYER_FOCUS);  const [search, setSearch] = useState("");
   const [editBdayFor, setEditBdayFor] = useState(null);
   const [editNameFor, setEditNameFor] = useState(null);
   const [nameInput, setNameInput] = useState("");
@@ -1211,7 +1210,7 @@ function toggleFollowUp(personId) {
   const [rosterGroup, setRosterGroup] = useState("all"); // all | ms | hs | leader
   const [rosterSort, setRosterSort] = useState("name"); // name | grade | birthday
 
-function chooseCurrentLeader(leaderId) {
+async function chooseCurrentLeader(leaderId) {
   if (!leaderId) {
     setCurrentLeaderId("");
     localStorage.removeItem("letspray-current-leader");
@@ -1224,11 +1223,31 @@ function chooseCurrentLeader(leaderId) {
   const savedLeaderId = localStorage.getItem("leaderSessionLeaderId");
 
   if (savedToken && savedLeaderId === leaderId) {
-    setCurrentLeaderId(leaderId);
-    setFilter("my-group");
-    localStorage.setItem("letspray-current-leader", leaderId);
-    return;
+  try {
+    const res = await fetch("/api/data?key=leader-session", {
+      headers: {
+        "Authorization": `Bearer ${savedToken}`,
+      },
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+
+      if (data.valid && data.leaderId === leaderId) {
+        setCurrentLeaderId(leaderId);
+        setFilter("my-group");
+        localStorage.setItem("letspray-current-leader", leaderId);
+        return;
+      }
+    }
+  } catch (_e) {
+    // Fall through to PIN prompt.
   }
+
+  localStorage.removeItem("leaderSessionToken");
+  localStorage.removeItem("leaderSessionLeaderId");
+  localStorage.removeItem("letspray-current-leader");
+}
 
   setPendingLeaderId(leaderId);
   setLeaderPinInput("");
