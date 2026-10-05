@@ -1894,30 +1894,32 @@ async function submitAdminPw() {
     {currentLeaderId &&
  current?.smallGroupLeader === currentLeaderId && (
   <div
-    style={{
-      marginBottom: 12,
-      padding: 12,
-      border: "1px solid #ddd",
-      borderRadius: 10,
-      background: "#fafafa",
-    }}
+   style={{
+  marginBottom: 12,
+  padding: 14,
+  border: `1px solid ${C.accent}`,
+  borderRadius: 12,
+  background: "rgba(255,255,255,0.035)",
+}}
   >
     <div
-      style={{
-        fontSize: 12,
-        fontWeight: 700,
-        marginBottom: 4,
-      }}
-    >
-      Private Leader Note
-    </div>
+  style={{
+    fontSize: 12,
+    fontWeight: 800,
+    marginBottom: 4,
+    color: C.accent,
+    letterSpacing: 0.3,
+  }}
+>
+  Private Leader Note
+</div>
 
     <div
       style={{
-        fontSize: 11,
-        opacity: 0.6,
-        marginBottom: 8,
-      }}
+  fontSize: 11,
+  color: "rgba(255,255,255,0.55)",
+  marginBottom: 10,
+}}
     >
       Only you can see this note.
     </div>
@@ -1942,16 +1944,20 @@ async function submitAdminPw() {
           placeholder="Add a private note about this student..."
           maxLength={2000}
           rows={3}
-          style={{
-            width: "100%",
-            boxSizing: "border-box",
-            resize: "vertical",
-            padding: 9,
-            border: "1px solid #ccc",
-            borderRadius: 8,
-            fontFamily: "inherit",
-            fontSize: 13,
-          }}
+       style={{
+  width: "100%",
+  boxSizing: "border-box",
+  resize: "vertical",
+  padding: "10px 11px",
+  border: "1px solid rgba(255,255,255,0.12)",
+  borderRadius: 8,
+  background: "rgba(0,0,0,0.18)",
+  color: "#f5f1e8",
+  fontFamily: "inherit",
+  fontSize: 13,
+  lineHeight: 1.45,
+  outline: "none",
+}}
         />
 
         <div
@@ -1962,9 +1968,9 @@ async function submitAdminPw() {
             marginTop: 6,
           }}
         >
-          <span style={{ fontSize: 11, opacity: 0.6 }}>
-            {privateNote.length}/2000
-          </span>
+         <span style={{ fontSize: 11, color: "rgba(255,255,255,0.45)" }}>
+  {privateNote.length}/2000
+</span>
 
           <div
             style={{
@@ -1973,18 +1979,32 @@ async function submitAdminPw() {
               gap: 8,
             }}
           >
-            {privateNoteStatus && (
-              <span style={{ fontSize: 11, opacity: 0.7 }}>
-                {privateNoteStatus}
-              </span>
-            )}
+           {privateNoteStatus && (
+  <span
+    style={{
+      fontSize: 11,
+      color: privateNoteStatus === "Saved" ? C.accent : "rgba(255,255,255,0.6)",
+    }}
+  >
+    {privateNoteStatus}
+  </span>
+)}
 
-            <button
-              onClick={savePrivateNote}
-              style={S.smallBtn}
-            >
-              Save Note
-            </button>
+<button
+  onClick={savePrivateNote}
+  style={{
+    background: C.accent,
+    color: "#fff",
+    border: "none",
+    borderRadius: 8,
+    padding: "7px 12px",
+    fontSize: 11,
+    fontWeight: 700,
+    cursor: "pointer",
+  }}
+>
+  Save Note
+</button>
           </div>
         </div>
       </>
