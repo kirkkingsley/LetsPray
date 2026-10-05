@@ -359,9 +359,12 @@ if (key === "settings") {
   }
 
   if (request.method === "POST") {
-    const authorized = await isValidAdminSession();
+   const existingRaw = await env.INTERCEDE_KV.get("settings");
+const authorized = await isValidAdminSession();
 
-if (!authorized) {
+// Allow the very first setup when no settings exist yet.
+// After setup, all settings changes require Admin authentication.
+if (existingRaw && !authorized) {
   return new Response(JSON.stringify({ error: "Unauthorized" }), {
     status: 401,
     headers
@@ -372,7 +375,7 @@ if (!authorized) {
     try {
       const parsed = JSON.parse(body);
 
-      const existingRaw = await env.INTERCEDE_KV.get("settings");
+     
       const existing = existingRaw ? JSON.parse(existingRaw) : {};
 
       const merged = {
