@@ -99,7 +99,51 @@ async function apiSave(people, force = false) {
   }
 }
 
+async function apiLoadPrivateNote(studentId) {
+  const token = localStorage.getItem("leaderSessionToken");
 
+  if (!token || !studentId) return "";
+
+  const res = await fetch(
+    `/api/data?key=private-note&studentId=${encodeURIComponent(studentId)}`,
+    {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error(`Private note load failed: ${res.status}`);
+  }
+
+  const data = await res.json();
+  return data.note || "";
+}
+
+async function apiSavePrivateNote(studentId, note) {
+  const token = localStorage.getItem("leaderSessionToken");
+
+  if (!token || !studentId) {
+    throw new Error("Leader authentication required");
+  }
+
+  const res = await fetch(
+    `/api/data?key=private-note&studentId=${encodeURIComponent(studentId)}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify({ note }),
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error(`Private note save failed: ${res.status}`);
+  }
+}
 
 async function apiLoadHistory() {
   const res = await fetch("/api/history");
@@ -612,6 +656,10 @@ function AppMain({ settings }) {
   const [addGroup, setAddGroup] = useState("hs");
   const [addSmallGroupLeader, setAddSmallGroupLeader] = useState("");
   const [leaderPinDrafts, setLeaderPinDrafts] = useState({});
+  const [privateNote, setPrivateNote] = useState("");
+const [privateNoteStudentId, setPrivateNoteStudentId] = useState(null);
+const [privateNoteLoading, setPrivateNoteLoading] = useState(false);
+const [privateNoteStatus, setPrivateNoteStatus] = useState("");
   const [currentLeaderId, setCurrentLeaderId] = useState(() => localStorage.getItem("letspray-current-leader") || "");
 const [weeklyPrayerFocus, setWeeklyPrayerFocus] = useState(WEEKLY_PRAYER_FOCUS);  const [search, setSearch] = useState("");
   const [editBdayFor, setEditBdayFor] = useState(null);
@@ -873,6 +921,45 @@ if (order === "oldest") return getFiltered()
 const leaderGroup = activePeople.filter(
   p => p.type === "student" && p.smallGroupLeader === currentLeaderId
 );
+  React.useEffect(() => {
+  if (
+    !current?.id ||
+    !currentLeaderId ||
+    current.smallGroupLeader !== currentLeaderId
+  ) {
+    setPrivateNote("");
+    setPrivateNoteStudentId(null);
+    setPrivateNoteStatus("");
+    return;
+  }
+
+  let cancelled = false;
+
+  setPrivateNoteLoading(true);
+  setPrivateNoteStatus("");
+
+  apiLoadPrivateNote(current.id)
+    .then(note => {
+      if (cancelled) return;
+
+      setPrivateNote(note);
+      setPrivateNoteStudentId(current.id);
+    })
+    .catch(() => {
+      if (cancelled) return;
+
+      setPrivateNote("");
+      setPrivateNoteStudentId(current.id);
+      setPrivateNoteStatus("Unable to load private note.");
+    })
+    .finally(() => {
+      if (!cancelled) setPrivateNoteLoading(false);
+    });
+
+  return () => {
+    cancelled = true;
+  };
+}, [current?.id, currentLeaderId]);
   const leaderActiveRequests = leaderGroup.reduce(
   (count, p) =>
     count +
@@ -1084,7 +1171,23 @@ function toggleFollowUp(personId) {
     return { ...p, leaderFollowUps, updatedAt: Date.now() };
   }));
 }
-  
+  async function savePrivateNote() {
+  if (!privateNoteStudentId || privateNoteStudentId !== current?.id) return;
+
+  if (privateNote.length > 2000) {
+    setPrivateNoteStatus("Private note must be 2,000 characters or less.");
+    return;
+  }
+
+  setPrivateNoteStatus("Saving...");
+
+  try {
+    await apiSavePrivateNote(privateNoteStudentId, privateNote);
+    setPrivateNoteStatus("Saved");
+  } catch (_e) {
+    setPrivateNoteStatus("Unable to save private note.");
+  }
+}
 
   function startKeepPraying(pool) {
     const p = pool || activePeople;
@@ -1788,6 +1891,106 @@ async function submitAdminPw() {
 <button onClick={() => toggleFollowUp(current.id)} style={{ background:"transparent", border:`1px solid ${C.accent}`, color:C.accent, borderRadius:10, padding:"9px 16px", fontSize:12, fontWeight:600, cursor:"pointer", display:"block", width:"100%", marginBottom:10 }}>    {current?.leaderFollowUps?.[currentLeaderId] ? "✓ Follow Up Flagged" : "+ Follow Up"}
   </button>
 )}
+    {currentLeaderId &&
+ current?.smallGroupLeader === currentLeaderId && (
+  <div
+    style={{
+      marginBottom: 12,
+      padding: 12,
+      border: "1px solid #ddd",
+      borderRadius: 10,
+      background: "#fafafa",
+    }}
+  >
+    <div
+      style={{
+        fontSize: 12,
+        fontWeight: 700,
+        marginBottom: 4,
+      }}
+    >
+      Private Leader Note
+    </div>
+
+    <div
+      style={{
+        fontSize: 11,
+        opacity: 0.6,
+        marginBottom: 8,
+      }}
+    >
+      Only you can see this note.
+    </div>
+
+    {privateNoteLoading ? (
+      <div style={{ fontSize: 12, opacity: 0.6 }}>
+        Loading note...
+      </div>
+    ) : (
+      <>
+        <textarea
+          value={
+            privateNoteStudentId === current.id
+              ? privateNote
+              : ""
+          }
+          onChange={e => {
+            setPrivateNote(e.target.value.slice(0, 2000));
+            setPrivateNoteStudentId(current.id);
+            setPrivateNoteStatus("");
+          }}
+          placeholder="Add a private note about this student..."
+          maxLength={2000}
+          rows={3}
+          style={{
+            width: "100%",
+            boxSizing: "border-box",
+            resize: "vertical",
+            padding: 9,
+            border: "1px solid #ccc",
+            borderRadius: 8,
+            fontFamily: "inherit",
+            fontSize: 13,
+          }}
+        />
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginTop: 6,
+          }}
+        >
+          <span style={{ fontSize: 11, opacity: 0.6 }}>
+            {privateNote.length}/2000
+          </span>
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            {privateNoteStatus && (
+              <span style={{ fontSize: 11, opacity: 0.7 }}>
+                {privateNoteStatus}
+              </span>
+            )}
+
+            <button
+              onClick={savePrivateNote}
+              style={S.smallBtn}
+            >
+              Save Note
+            </button>
+          </div>
+        </div>
+      </>
+    )}
+  </div>
+)}              
                   {withinWeek(current?.prayedAt) && !pinnedPerson && !keepPrayingMode ? (
                     <div style={S.prayedActions}>
                       <div style={S.prayedConfirm}><Heart size={16} fill={C.prayedGreen} color={C.prayedGreen} style={{ marginRight: 7 }} /> Prayed!</div>
