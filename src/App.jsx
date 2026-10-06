@@ -2342,26 +2342,27 @@ width: `${leaderGroup.length ? (leaderPrayedThisWeek.length / leaderGroup.length
       )
       .sort((a, b) => a.name.localeCompare(b.name))
       .map(p => (
-        <div
-          key={p.id}
-          onClick={() => goToPerson(p.id)}
-          style={{ ...S.weekRow, cursor: "pointer" }}
-        >
-          <div>
-            <div style={S.weekName}>{p.name}</div>
-            {(p.prayerRequests || [])
-              .filter(req =>
-                typeof req !== "string" && req.status === "answered"
-              )
-              .map((req, i) => (
-                <div key={i} style={S.weekMeta}>
-                  {req.text}
-                </div>
-              ))}
-          </div>
+       <div
+  key={p.id}
+  onClick={() => goToPerson(p.id)}
+  style={S.praiseRow}
+>
+  <div style={S.praiseIcon}>✓</div>
+
+  <div style={{ flex: 1 }}>
+    <div style={S.praiseName}>{p.name}</div>
+
+    {(p.prayerRequests || [])
+      .filter(req =>
+        typeof req !== "string" && req.status === "answered"
+      )
+      .map((req, i) => (
+        <div key={i} style={S.praiseText}>
+          {req.text}
         </div>
       ))}
   </div>
+</div>
 )}
       
       {/* ─── WEEK SUMMARY ─── */}
@@ -3084,6 +3085,42 @@ reqPraise: {
   fontWeight: 700,
   cursor: "pointer",
   flexShrink: 0,
+},praiseRow: {
+  display: "flex",
+  alignItems: "flex-start",
+  gap: 10,
+  padding: "11px 12px",
+  borderTop: `1px solid ${C.border}`,
+  cursor: "pointer",
+},
+
+praiseIcon: {
+  width: 22,
+  height: 22,
+  borderRadius: "50%",
+  background: C.accentSoft,
+  border: `1px solid ${C.accent}`,
+  color: C.accent,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontSize: 12,
+  fontWeight: 700,
+  flexShrink: 0,
+  marginTop: 1,
+},
+
+praiseName: {
+  fontSize: 13,
+  fontWeight: 600,
+  color: C.cream,
+  marginBottom: 3,
+},
+
+praiseText: {
+  fontSize: 12,
+  lineHeight: 1.45,
+  color: C.muted,
 },
   reqInputRow: { display: "flex", gap: 6, alignItems: "center", marginTop: 4 },
   reqInput: { flex: 1, background: C.faint, border: `1px solid ${C.border}`, borderRadius: 8, color: C.cream, padding: "7px 10px", fontSize: 13, fontFamily: "'Inter', system-ui, sans-serif", outline: "none" },
