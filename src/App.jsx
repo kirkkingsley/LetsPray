@@ -3122,7 +3122,7 @@ praiseName: {
 praiseText: {
   fontSize: 12,
   lineHeight: 1.45,
-  color: C.muted,
+color: "rgba(255,255,255,0.68)",
 },
   reqInputRow: { display: "flex", gap: 6, alignItems: "center", marginTop: 4 },
   reqInput: { flex: 1, background: C.faint, border: `1px solid ${C.border}`, borderRadius: 8, color: C.cream, padding: "7px 10px", fontSize: 13, fontFamily: "'Inter', system-ui, sans-serif", outline: "none" },
