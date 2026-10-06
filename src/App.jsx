@@ -2361,7 +2361,8 @@ width: `${leaderGroup.length ? (leaderPrayedThisWeek.length / leaderGroup.length
           {req.text}
         </div>
       ))}
-  </div>
+ </div>
+))}
 </div>
 )}
       
