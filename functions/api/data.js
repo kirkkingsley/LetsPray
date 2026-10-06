@@ -1,3 +1,16 @@
+async function hashPin(pin) {
+  const data = new TextEncoder().encode(String(pin));
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+
+  return Array.from(new Uint8Array(hashBuffer))
+    .map(byte => byte.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+async function verifyPin(pin, storedHash) {
+  const pinHash = await hashPin(pin);
+  return pinHash === storedHash;
+}
 export async function onRequest(context) {
   const { request, env } = context;
 
@@ -189,13 +202,38 @@ if (key === "leader-auth" && request.method === "POST") {
          p.active !== false
   );
 
-  if (!leader || !leader.pin || String(leader.pin) !== pin) {
-    return new Response(JSON.stringify({ ok: false }), {
-      status: 401,
-      headers
-    });
-  }
+if (!leader) {
+  return new Response(JSON.stringify({ ok: false }), {
+    status: 401,
+    headers
+  });
+}
 
+let pinIsValid = false;
+
+if (leader.pinHash) {
+  pinIsValid = await verifyPin(pin, leader.pinHash);
+} else if (leader.pin) {
+  pinIsValid = String(leader.pin) === pin;
+}
+
+if (!pinIsValid) {
+  return new Response(JSON.stringify({ ok: false }), {
+    status: 401,
+    headers
+  });
+}
+  
+  // Automatically migrate an existing plaintext PIN to a hash
+if (!leader.pinHash && leader.pin) {
+  const pinHash = await hashPin(pin);
+
+  leader.pinHash = pinHash;
+  delete leader.pin;
+  leader.updatedAt = Date.now();
+
+  await env.INTERCEDE_KV.put("people", JSON.stringify(people));
+}
   const token = crypto.randomUUID();
   const expiresAt = Date.now() + (30 * 24 * 60 * 60 * 1000);
 
@@ -255,11 +293,15 @@ if (key === "leader-pin" && request.method === "POST") {
     });
   }
 
-  people[leaderIndex] = {
-    ...people[leaderIndex],
-    pin,
-    updatedAt: Date.now()
-  };
+ const pinHash = await hashPin(pin);
+
+people[leaderIndex] = {
+  ...people[leaderIndex],
+  pinHash,
+  updatedAt: Date.now()
+};
+
+delete people[leaderIndex].pin;
 
   await env.INTERCEDE_KV.put("people", JSON.stringify(people));
 
@@ -404,8 +446,7 @@ if (request.method === "GET") {
   const leaderId = leaderSession?.leaderId;
 
   const publicPeople = people.map(person => {
-    const { pin, leaderFollowUps, ...safePerson } = person;
-
+const { pin, pinHash, leaderFollowUps, ...safePerson } = person;
     // Only return this leader's own Follow Up data.
     if (
       leaderId &&
@@ -493,6 +534,7 @@ const merged = incoming.map(p => {
       return {
         ...p,
         ...(s.pin ? { pin: s.pin } : {}),
+        ...(s.pinHash ? { pinHash: s.pinHash } : {}),
       };
     }
 
