@@ -395,19 +395,35 @@ if (existingRaw && !authorized) {
   }
 }
 
- // People endpoint (default)
+// People endpoint (default)
 if (request.method === "GET") {
   const data = await env.INTERCEDE_KV.get("people");
   const people = data ? JSON.parse(data) : [];
 
+  const leaderSession = await getValidLeaderSession();
+  const leaderId = leaderSession?.leaderId;
+
   const publicPeople = people.map(person => {
-    const { pin, ...safePerson } = person;
+    const { pin, leaderFollowUps, ...safePerson } = person;
+
+    // Only return this leader's own Follow Up data.
+    if (
+      leaderId &&
+      person.type === "student" &&
+      person.active !== false &&
+      person.smallGroupLeader === leaderId &&
+      leaderFollowUps?.[leaderId] !== undefined
+    ) {
+      safePerson.leaderFollowUps = {
+        [leaderId]: leaderFollowUps[leaderId],
+      };
+    }
+
     return safePerson;
   });
 
   return new Response(JSON.stringify(publicPeople), { headers });
 }
-
   if (request.method === "POST") {
     const adminAuthorized = await isValidAdminSession();
 const leaderSession = adminAuthorized
