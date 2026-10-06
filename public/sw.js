@@ -41,3 +41,49 @@ self.addEventListener("fetch", event => {
       .catch(() => caches.match(event.request))
   );
 });
+self.addEventListener("push", event => {
+  let data = {
+    title: "Let’s Pray",
+    body: "Take a few minutes to pray for your students this week.",
+  };
+
+  if (event.data) {
+    try {
+      data = { ...data, ...event.data.json() };
+    } catch (_e) {}
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: "/icon-192.png",
+      badge: "/icon-192.png",
+      tag: "weekly-prayer-reminder",
+      data: {
+        url: data.url || "/",
+      },
+    })
+  );
+});
+
+self.addEventListener("notificationclick", event => {
+  event.notification.close();
+
+  const targetUrl = event.notification.data?.url || "/";
+
+  event.waitUntil(
+    clients.matchAll({
+      type: "window",
+      includeUncontrolled: true,
+    }).then(windowClients => {
+      for (const client of windowClients) {
+        if ("focus" in client) {
+          client.navigate(targetUrl);
+          return client.focus();
+        }
+      }
+
+      return clients.openWindow(targetUrl);
+    })
+  );
+});
