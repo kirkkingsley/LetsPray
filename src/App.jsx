@@ -2342,28 +2342,30 @@ width: `${leaderGroup.length ? (leaderPrayedThisWeek.length / leaderGroup.length
       )
       .sort((a, b) => a.name.localeCompare(b.name))
       .map(p => (
-       <div
-  key={p.id}
-  onClick={() => goToPerson(p.id)}
-  style={S.praiseRow}
->
-  <div style={S.praiseIcon}>✓</div>
+        <div
+          key={p.id}
+          onClick={() => goToPerson(p.id)}
+          style={S.praiseRow}
+        >
+          <div style={S.praiseIcon}>✓</div>
 
-  <div style={{ flex: 1 }}>
-    <div style={S.praiseName}>{p.name}</div>
+          <div style={{ flex: 1 }}>
+            <div style={S.praiseName}>{p.name}</div>
 
-    {(p.prayerRequests || [])
-      .filter(req =>
-        typeof req !== "string" && req.status === "answered"
-      )
-      .map((req, i) => (
-        <div key={i} style={S.praiseText}>
-          {req.text}
+            {(p.prayerRequests || [])
+              .filter(req =>
+                typeof req !== "string" && req.status === "answered"
+              )
+              .map((req, i) => (
+                <div key={i} style={S.praiseText}>
+                  {req.text}
+                </div>
+              ))}
+          </div>
         </div>
       ))}
- </div>
-))}
-</div>
+  </div>
+)}
       
       {/* ─── WEEK SUMMARY ─── */}
       {view === "week" && (
