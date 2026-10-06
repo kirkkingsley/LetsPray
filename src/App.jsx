@@ -125,6 +125,13 @@ async function apiLoadPrivateNote(studentId) {
     }
   );
 
+  if (res.status === 401) {
+    localStorage.removeItem("leaderSessionToken");
+    localStorage.removeItem("leaderSessionLeaderId");
+    localStorage.removeItem("letspray-current-leader");
+    throw new Error("SESSION_EXPIRED");
+  }
+
   if (!res.ok) {
     throw new Error(`Private note load failed: ${res.status}`);
   }
@@ -137,7 +144,7 @@ async function apiSavePrivateNote(studentId, note) {
   const token = localStorage.getItem("leaderSessionToken");
 
   if (!token || !studentId) {
-    throw new Error("Leader authentication required");
+    throw new Error("SESSION_EXPIRED");
   }
 
   const res = await fetch(
@@ -151,6 +158,13 @@ async function apiSavePrivateNote(studentId, note) {
       body: JSON.stringify({ note }),
     }
   );
+
+  if (res.status === 401) {
+    localStorage.removeItem("leaderSessionToken");
+    localStorage.removeItem("leaderSessionLeaderId");
+    localStorage.removeItem("letspray-current-leader");
+    throw new Error("SESSION_EXPIRED");
+  }
 
   if (!res.ok) {
     throw new Error(`Private note save failed: ${res.status}`);
@@ -956,13 +970,27 @@ const leaderGroup = activePeople.filter(
       setPrivateNote(note);
       setPrivateNoteStudentId(current.id);
     })
-    .catch(() => {
-      if (cancelled) return;
+   .catch((err) => {
+  if (cancelled) return;
 
-      setPrivateNote("");
-      setPrivateNoteStudentId(current.id);
-      setPrivateNoteStatus("Unable to load private note.");
-    })
+  if (err.message === "SESSION_EXPIRED") {
+    setPrivateNote("");
+    setPrivateNoteStudentId(null);
+    setPrivateNoteStatus("");
+
+    setPendingLeaderId(currentLeaderId);
+    setLeaderPinInput("");
+    setLeaderPinError("Your session expired. Enter your PIN to continue.");
+    setShowLeaderPinPrompt(true);
+    setCurrentLeaderId("");
+
+    return;
+  }
+
+  setPrivateNote("");
+  setPrivateNoteStudentId(current.id);
+  setPrivateNoteStatus("Unable to load private note.");
+})
     .finally(() => {
       if (!cancelled) setPrivateNoteLoading(false);
     });
@@ -1192,12 +1220,24 @@ function toggleFollowUp(personId) {
 
   setPrivateNoteStatus("Saving...");
 
-  try {
-    await apiSavePrivateNote(privateNoteStudentId, privateNote);
-    setPrivateNoteStatus("Saved");
-  } catch (_e) {
-    setPrivateNoteStatus("Unable to save private note.");
+try {
+  await apiSavePrivateNote(privateNoteStudentId, privateNote);
+  setPrivateNoteStatus("Saved");
+} catch (err) {
+  if (err.message === "SESSION_EXPIRED") {
+    setPrivateNoteStatus("");
+
+    setPendingLeaderId(currentLeaderId);
+    setLeaderPinInput("");
+    setLeaderPinError("Your session expired. Enter your PIN to continue.");
+    setShowLeaderPinPrompt(true);
+    setCurrentLeaderId("");
+
+    return;
   }
+
+  setPrivateNoteStatus("Unable to save private note.");
+}
 }
 
   function startKeepPraying(pool) {
