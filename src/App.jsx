@@ -1859,15 +1859,17 @@ async function submitAdminPw() {
                       {(current?.prayerRequests || []).length > 0 && (
                         <div style={S.reqBox}>
                           <p style={S.reqLabel}>Prayer Requests</p>
-                          {current.prayerRequests.map((req, i) => (
-                            <div key={i} style={S.reqItem}>
+{current.prayerRequests
+.map((req, originalIndex) => ({ req, originalIndex }))
+.filter(({ req }) => typeof req === "string" || req.status !== "answered")
+.map(({ req, originalIndex }) => (<div key={originalIndex} style={S.reqItem}>
                               <span style={S.reqDot}>◆</span>
 <span style={S.reqText}>
-  {typeof req !== "string" && req.status === "answered" ? `PRAISE — ${req.text}` : (typeof req === "string" ? req : req.text)}
+{typeof req === "string" ? req : req.text}
 </span>                             {(typeof req === "string" || req.status !== "answered") && (
-<button onClick={() => markRequestAnswered(current.id, i)} style={S.reqPraise}>Praise</button>
+<button onClick={() => markRequestAnswered(current.id, originalIndex)} style={S.reqPraise}>Praise</button>
   )}
-                              <button onClick={() => removeRequest(current.id, i)} style={S.reqRemove}><X size={11} /></button>
+                              <button onClick={() => removeRequest(current.id, originalIndex)} style={S.reqRemove}><X size={11} /></button>
                             </div>
                           ))}
                         </div>
