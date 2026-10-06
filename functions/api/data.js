@@ -192,7 +192,26 @@ if (key === "leader-auth" && request.method === "POST") {
   const body = await request.json();
   const leaderId = body.leaderId;
   const pin = String(body.pin || "");
+const attemptKey = `leader_pin_attempts:${leaderId}`;
+const rawAttempts = await env.INTERCEDE_KV.get(attemptKey);
 
+let attempts = rawAttempts
+  ? JSON.parse(rawAttempts)
+  : { count: 0 };
+
+if (attempts.count >= 5) {
+  return new Response(
+    JSON.stringify({
+      ok: false,
+      locked: true,
+      error: "Too many incorrect PIN attempts. Try again in 15 minutes."
+    }),
+    {
+      status: 429,
+      headers
+    }
+  );
+}
   const raw = await env.INTERCEDE_KV.get("people");
   const people = raw ? JSON.parse(raw) : [];
 
@@ -218,10 +237,28 @@ if (leader.pinHash) {
 }
 
 if (!pinIsValid) {
-  return new Response(JSON.stringify({ ok: false }), {
-    status: 401,
-    headers
-  });
+  attempts.count += 1;
+
+  await env.INTERCEDE_KV.put(
+    attemptKey,
+    JSON.stringify(attempts),
+    { expirationTtl: 900 }
+  );
+
+  return new Response(
+    JSON.stringify({
+      ok: false,
+      locked: attempts.count >= 5,
+      error:
+        attempts.count >= 5
+          ? "Too many incorrect PIN attempts. Try again in 15 minutes."
+          : "Incorrect PIN."
+    }),
+    {
+      status: attempts.count >= 5 ? 429 : 401,
+      headers
+    }
+  );
 }
   
   // Automatically migrate an existing plaintext PIN to a hash
@@ -234,6 +271,9 @@ if (!leader.pinHash && leader.pin) {
 
   await env.INTERCEDE_KV.put("people", JSON.stringify(people));
 }
+  
+  // Successful login clears failed PIN attempts
+await env.INTERCEDE_KV.delete(attemptKey);
   const token = crypto.randomUUID();
   const expiresAt = Date.now() + (30 * 24 * 60 * 60 * 1000);
 
