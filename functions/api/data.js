@@ -529,7 +529,8 @@ if (p.leaderPrayerHistory?.[leaderId] !== undefined) {
     leaderPrayerDates,
     leaderPrayerHistory,
     leaderFollowUps,
-
+prayerRequests: p.prayerRequests || [],
+    
     // Keep these legacy prayer fields working for now.
     prayedAt: p.prayedAt,
     prayedWeek: p.prayedWeek,
