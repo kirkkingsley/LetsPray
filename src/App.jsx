@@ -70,11 +70,23 @@ async function apiSaveSettings(settings) {
 }
 
 async function apiLoad() {
-  const res = await fetch("/api/data");
+  const leaderToken = localStorage.getItem("leaderSessionToken");
+
+  const res = await fetch("/api/data", {
+    headers: {
+      ...(leaderToken
+        ? { "Authorization": `Bearer ${leaderToken}` }
+        : {}),
+    },
+  });
+
   if (!res.ok) throw new Error("load failed");
+
   const data = await res.json();
+
   // Treat an empty array from KV as suspicious — never trust it over local state
   if (!Array.isArray(data)) throw new Error("bad data");
+
   return data;
 }
 
@@ -1279,6 +1291,8 @@ async function chooseCurrentLeader(leaderId) {
     localStorage.setItem("leaderSessionLeaderId", data.leaderId);
     localStorage.setItem("letspray-current-leader", data.leaderId);
 
+    const refreshedPeople = await apiLoad();
+setPeople(refreshedPeople);
     setCurrentLeaderId(data.leaderId);
     setFilter("my-group");
     setShowLeaderPinPrompt(false);
