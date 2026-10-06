@@ -295,6 +295,51 @@ await env.INTERCEDE_KV.delete(attemptKey);
     headers
   });
 }
+  // Save a leader's Web Push subscription
+if (key === "push-subscription" && request.method === "POST") {
+  const leaderSession = await getValidLeaderSession();
+
+  if (!leaderSession) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers
+    });
+  }
+
+  const body = await request.json();
+  const subscription = body.subscription;
+
+  if (
+    !subscription ||
+    typeof subscription.endpoint !== "string" ||
+    !subscription.keys?.p256dh ||
+    !subscription.keys?.auth
+  ) {
+    return new Response(
+      JSON.stringify({ error: "Invalid push subscription" }),
+      {
+        status: 400,
+        headers
+      }
+    );
+  }
+
+  const subscriptionKey = `push_subscription:${leaderSession.leaderId}`;
+
+  await env.INTERCEDE_KV.put(
+    subscriptionKey,
+    JSON.stringify({
+      leaderId: leaderSession.leaderId,
+      subscription,
+      updatedAt: Date.now()
+    })
+  );
+
+  return new Response(JSON.stringify({ ok: true }), {
+    status: 200,
+    headers
+  });
+}
 // Admin-only leader PIN endpoint
 if (key === "leader-pin" && request.method === "POST") {
   const authorized = await isValidAdminSession();
