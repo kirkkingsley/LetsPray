@@ -1320,10 +1320,17 @@ async function chooseCurrentLeader(leaderId) {
     });
 
     if (!res.ok) {
-      setLeaderPinError("Incorrect PIN.");
-      setLeaderPinInput("");
-      return;
-    }
+  let errorMessage = "Incorrect PIN.";
+
+  try {
+    const errorData = await res.json();
+    errorMessage = errorData.error || errorMessage;
+  } catch (_e) {}
+
+  setLeaderPinError(errorMessage);
+  setLeaderPinInput("");
+  return;
+}
 
     const data = await res.json();
 
