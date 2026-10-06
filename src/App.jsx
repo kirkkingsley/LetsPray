@@ -1284,7 +1284,26 @@ if (!subscription) {
   });
 }
 
-console.log("Push subscription created:", subscription);
+const leaderToken = localStorage.getItem("leaderSessionToken");
+
+if (!leaderToken) {
+  throw new Error("No leader session available.");
+}
+
+const saveResponse = await fetch("/api/data?key=push-subscription", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${leaderToken}`,
+  },
+  body: JSON.stringify({
+    subscription: subscription.toJSON(),
+  }),
+});
+
+if (!saveResponse.ok) {
+  throw new Error("Unable to save push subscription.");
+}
 
 setRemindersEnabled(true);
 setReminderStatus("Weekly reminder enabled for Wednesday at 7:00 PM.");
