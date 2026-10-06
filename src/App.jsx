@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight, Heart, Plus, Trash2, Upload, X, RefreshCw, B
 const STORAGE_KEY = "intercede-people-v2";
 // Settings loaded from KV on startup
 const SETUP_KEY = "letspray-setup"; // legacy local fallback
-
+const VAPID_PUBLIC_KEY = "BJS_48Rf5ulQD5wCiRQS0ozG7czKd8fwpR_jMTzqumVcZexev5bsX9FMOmieLGSwfMdQZ3zHPgIPrcXsEIZyBpQ";
 const TAP_KEY = "intercede-tap-ts";
 const TAP_TTL = 24 * 60 * 60 * 1000;
 
@@ -1244,6 +1244,18 @@ try {
   setPrivateNoteStatus("Unable to save private note.");
 }
 }
+  function urlBase64ToUint8Array(base64String) {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding)
+    .replace(/-/g, "+")
+    .replace(/_/g, "/");
+
+  const rawData = window.atob(base64);
+
+  return Uint8Array.from(
+    [...rawData].map(char => char.charCodeAt(0))
+  );
+}
 async function enableWeeklyReminder() {
   setReminderStatus("");
 
@@ -1263,8 +1275,19 @@ async function enableWeeklyReminder() {
 
     const registration = await navigator.serviceWorker.ready;
 
-    setRemindersEnabled(true);
-    setReminderStatus("Weekly reminder enabled for Wednesday at 7:00 PM.");
+let subscription = await registration.pushManager.getSubscription();
+
+if (!subscription) {
+  subscription = await registration.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+  });
+}
+
+console.log("Push subscription created:", subscription);
+
+setRemindersEnabled(true);
+setReminderStatus("Weekly reminder enabled for Wednesday at 7:00 PM.");
   } catch (err) {
     console.error("Unable to enable notifications:", err);
     setReminderStatus("Unable to enable notifications.");
