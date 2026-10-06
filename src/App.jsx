@@ -1756,7 +1756,11 @@ async function submitAdminPw() {
           <div style={S.controls}>
             <div style={S.togglePill}>
               <button onClick={() => { setOrder("random"); buildDeck(); }} style={{ ...S.toggleOpt, ...(order === "random" ? S.toggleOptOn : {}) }}>Shuffle</button>
-              <button onClick={() => { setOrder("alpha"); setCardIdx(0); if (shouldShowTap()) setReady(false); }} style={{ ...S.toggleOpt, ...(order === "alpha" ? S.toggleOptOn : {}) }}>A–Z</button>
+              <button onClick={() => { setOrder("alpha"); setCardIdx(0); if (shouldShowTap()) setReady(false); }} style={{
+  ...S.toggleOpt,
+  whiteSpace: "nowrap",
+  ...(order === "alpha" ? S.toggleOptOn : {})
+}}>A–Z</button>
               <button onClick={() => { setOrder("oldest"); setCardIdx(0); if (shouldShowTap()) setReady(false); }} style={{ ...S.toggleOpt, ...(order === "oldest" ? S.toggleOptOn : {}) }}>Time</button>
             </div>
             <select value={filter} onChange={e => { setFilter(e.target.value); setCardIdx(0); if (shouldShowTap()) setReady(false); }} style={S.filterSelect}>
@@ -3045,14 +3049,14 @@ const S = {
   header: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 20px 0" },
   logoWrap: { display: "flex", alignItems: "center", gap: 8 },
   logoCross: { fontSize: 18, color: C.accent },
-  logoText: { fontFamily: "'Lora', Georgia, serif", fontSize: 24, fontWeight: 600, color: C.cream, letterSpacing: "0.01em" },
+  logoText: { fontFamily: "'Lora', Georgia, serif", fontSize: 21, fontWeight: 600, color: C.cream, letterSpacing: "0.01em" },
   weekBar: { display: "flex", alignItems: "center", gap: 6, background: C.surface, border: `1px solid ${C.border}`, borderRadius: 20, padding: "5px 12px" },
   weekText: { fontSize: 12, color: C.muted },
   bdayAlert: { fontSize: 11, background: C.faint, color: C.accent, borderRadius: 10, padding: "2px 7px 2px 6px", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 3, verticalAlign: "middle" },
   progressTrack: { margin: "14px 20px 0", height: 3, background: C.faint, borderRadius: 2, overflow: "hidden" },
   progressFill: { height: "100%", background: C.accent, borderRadius: 2, transition: "width 0.6s ease" },
   tabs: { display: "flex", borderBottom: `1px solid ${C.border}`, margin: "14px 0 0" },
-  tab: { flex: 1, background: "none", border: "none", color: C.muted, padding: "10px 0", cursor: "pointer", fontFamily: "'Inter', system-ui, sans-serif", fontSize: 13, fontWeight: 400, letterSpacing: "0.04em", transition: "color 0.2s" },
+  tab: { flex: 1, background: "none", border: "none", color: C.muted, padding: "10px 0", cursor: "pointer", fontFamily: "'Inter', system-ui, sans-serif", fontSize: 13, fontWeight: 400, letterSpacing: "0.01em", transition: "color 0.2s" },
   tabActive: { color: C.cream, borderBottom: `2px solid ${C.accent}`, marginBottom: -1, fontWeight: 600 },
   // PRAY
   prayWrap: { flex: 1, display: "flex", flexDirection: "column", padding: "16px 20px 28px" },
