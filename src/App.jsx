@@ -686,6 +686,11 @@ function AppMain({ settings }) {
 const [privateNoteStudentId, setPrivateNoteStudentId] = useState(null);
 const [privateNoteLoading, setPrivateNoteLoading] = useState(false);
 const [privateNoteStatus, setPrivateNoteStatus] = useState("");
+  const [notificationPermission, setNotificationPermission] = useState(
+  typeof Notification !== "undefined" ? Notification.permission : "default"
+);
+const [remindersEnabled, setRemindersEnabled] = useState(false);
+const [reminderStatus, setReminderStatus] = useState("");
 const [currentLeaderId, setCurrentLeaderId] = useState("");const [weeklyPrayerFocus, setWeeklyPrayerFocus] = useState(WEEKLY_PRAYER_FOCUS);  const [search, setSearch] = useState("");
   const [editBdayFor, setEditBdayFor] = useState(null);
   const [editNameFor, setEditNameFor] = useState(null);
@@ -1239,7 +1244,32 @@ try {
   setPrivateNoteStatus("Unable to save private note.");
 }
 }
+async function enableWeeklyReminder() {
+  setReminderStatus("");
 
+  if (!("Notification" in window) || !("serviceWorker" in navigator)) {
+    setReminderStatus("Notifications are not supported on this device.");
+    return;
+  }
+
+  try {
+    const permission = await Notification.requestPermission();
+    setNotificationPermission(permission);
+
+    if (permission !== "granted") {
+      setReminderStatus("Notification permission was not granted.");
+      return;
+    }
+
+    const registration = await navigator.serviceWorker.ready;
+
+    setRemindersEnabled(true);
+    setReminderStatus("Weekly reminder enabled for Wednesday at 7:00 PM.");
+  } catch (err) {
+    console.error("Unable to enable notifications:", err);
+    setReminderStatus("Unable to enable notifications.");
+  }
+}
   function startKeepPraying(pool) {
     const p = pool || activePeople;
     if (!p.length) return;
@@ -2199,6 +2229,63 @@ async function submitAdminPw() {
   {weeklyPrayerFocus}
 </div>
       </div>
+)}
+  {currentLeaderId && (
+  <div style={{
+    background: C.surface,
+    border: `1px solid ${C.border}`,
+    borderRadius: 14,
+    padding: "14px 16px",
+    marginBottom: 18
+  }}>
+    <div style={{
+      fontSize: 11,
+      color: C.accent,
+      textTransform: "uppercase",
+      letterSpacing: "0.08em",
+      fontWeight: 700,
+      marginBottom: 6
+    }}>
+      Weekly Prayer Reminder
+    </div>
+
+    <div style={{
+      fontSize: 13,
+      lineHeight: 1.5,
+      color: C.muted,
+      marginBottom: 12
+    }}>
+      Get a reminder every Wednesday at 7:00 PM to pray for your students.
+    </div>
+
+    {!remindersEnabled ? (
+      <button
+        onClick={enableWeeklyReminder}
+        style={S.reminderSetupBtn}
+      >
+        Enable Weekly Reminder
+      </button>
+    ) : (
+      <div style={{
+        fontSize: 13,
+        color: C.accent,
+        fontWeight: 600
+      }}>
+        ✓ Wednesday at 7:00 PM
+      </div>
+    )}
+
+    {reminderStatus && (
+      <div style={{
+        marginTop: 9,
+        fontSize: 11,
+        color: C.muted,
+        lineHeight: 1.4
+      }}>
+        {reminderStatus}
+      </div>
+    )}
+  </div>
 )}
     <div style={{ marginBottom: 14, fontSize: 14, color: C.cream }}>
   {people.filter(p =>
