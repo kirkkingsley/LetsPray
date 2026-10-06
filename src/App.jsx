@@ -2364,7 +2364,6 @@ width: `${leaderGroup.length ? (leaderPrayedThisWeek.length / leaderGroup.length
  </div>
 ))}
 </div>
-)}
       
       {/* ─── WEEK SUMMARY ─── */}
       {view === "week" && (
