@@ -1,0 +1,16 @@
+{
+  "name": "letspray-reminders-worker",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev --test-scheduled",
+    "start": "wrangler dev --test-scheduled"
+  },
+  "devDependencies": {
+    "wrangler": "^4.148.0"
+  },
+  "dependencies": {
+    "web-push": "^3.6.7"
+  }
+}
