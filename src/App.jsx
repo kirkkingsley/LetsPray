@@ -1346,6 +1346,41 @@ setReminderStatus("Weekly reminder enabled for Wednesday at 7:00 PM.");
     setReminderStatus("Unable to enable notifications.");
   }
 }
+  async function disableWeeklyReminder() {
+  setReminderStatus("");
+
+  try {
+    const leaderToken = localStorage.getItem("leaderSessionToken");
+
+    if (!leaderToken) {
+      throw new Error("No leader session available.");
+    }
+
+    const response = await fetch("/api/data?key=push-subscription", {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${leaderToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Unable to disable reminder.");
+    }
+
+    const registration = await navigator.serviceWorker.ready;
+    const subscription = await registration.pushManager.getSubscription();
+
+    if (subscription) {
+      await subscription.unsubscribe();
+    }
+
+    setRemindersEnabled(false);
+    setReminderStatus("");
+  } catch (err) {
+    console.error("Unable to disable reminder:", err);
+    setReminderStatus("Unable to disable reminder.");
+  }
+}
   function startKeepPraying(pool) {
     const p = pool || activePeople;
     if (!p.length) return;
@@ -2361,6 +2396,34 @@ async function submitAdminPw() {
         {reminderStatus}
       </div>
     )}
+  </div>
+)}
+    {currentLeaderId && remindersEnabled && (
+  <div style={{
+    marginBottom: 18,
+    fontSize: 12,
+    color: C.muted,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12
+  }}>
+    <span>Weekly reminder · Wednesday at 7:00 PM</span>
+
+    <button
+      onClick={disableWeeklyReminder}
+      style={{
+        background: "none",
+        border: "none",
+        padding: 0,
+        color: C.muted,
+        fontSize: 11,
+        textDecoration: "underline",
+        cursor: "pointer"
+      }}
+    >
+      Turn Off
+    </button>
   </div>
 )}
     <div style={{ marginBottom: 14, fontSize: 14, color: C.cream }}>
