@@ -319,6 +319,26 @@ if (key === "push-subscription" && request.method === "GET") {
     }
   );
 }
+  // Disable this leader's Web Push subscription
+if (key === "push-subscription" && request.method === "DELETE") {
+  const leaderSession = await getValidLeaderSession();
+
+  if (!leaderSession) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers
+    });
+  }
+
+  const subscriptionKey = `push_subscription:${leaderSession.leaderId}`;
+
+  await env.INTERCEDE_KV.delete(subscriptionKey);
+
+  return new Response(JSON.stringify({ ok: true }), {
+    status: 200,
+    headers
+  });
+}
   // Save a leader's Web Push subscription
 if (key === "push-subscription" && request.method === "POST") {
   const leaderSession = await getValidLeaderSession();
