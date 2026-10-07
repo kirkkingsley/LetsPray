@@ -295,6 +295,30 @@ await env.INTERCEDE_KV.delete(attemptKey);
     headers
   });
 }
+  // Check whether this leader has a Web Push subscription
+if (key === "push-subscription" && request.method === "GET") {
+  const leaderSession = await getValidLeaderSession();
+
+  if (!leaderSession) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers
+    });
+  }
+
+  const subscriptionKey = `push_subscription:${leaderSession.leaderId}`;
+  const subscription = await env.INTERCEDE_KV.get(subscriptionKey);
+
+  return new Response(
+    JSON.stringify({
+      enabled: Boolean(subscription)
+    }),
+    {
+      status: 200,
+      headers
+    }
+  );
+}
   // Save a leader's Web Push subscription
 if (key === "push-subscription" && request.method === "POST") {
   const leaderSession = await getValidLeaderSession();
