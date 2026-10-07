@@ -747,6 +747,40 @@ const [pendingLeaderId, setPendingLeaderId] = useState(null);
     return () => { link.remove(); style.remove(); };
   }, []);
 
+  useEffect(() => {
+  if (!currentLeaderId) {
+    setRemindersEnabled(false);
+    return;
+  }
+
+  const leaderToken = localStorage.getItem("leaderSessionToken");
+
+  if (!leaderToken) {
+    setRemindersEnabled(false);
+    return;
+  }
+
+  (async () => {
+    try {
+      const res = await fetch("/api/data?key=push-subscription", {
+        headers: {
+          "Authorization": `Bearer ${leaderToken}`,
+        },
+      });
+
+      if (!res.ok) {
+        setRemindersEnabled(false);
+        return;
+      }
+
+      const data = await res.json();
+      setRemindersEnabled(Boolean(data.enabled));
+    } catch (_e) {
+      setRemindersEnabled(false);
+    }
+  })();
+}, [currentLeaderId]);
+
   // Load from KV + snapshot previous week if it just rolled over
   useEffect(() => {
     (async () => {
@@ -2272,7 +2306,7 @@ async function submitAdminPw() {
 </div>
       </div>
 )}
-  {currentLeaderId && (
+  {currentLeaderId && !remindersEnabled && (
   <div style={{
     background: C.surface,
     border: `1px solid ${C.border}`,
