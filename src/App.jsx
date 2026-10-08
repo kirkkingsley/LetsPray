@@ -2326,8 +2326,10 @@ async function submitAdminPw() {
               )}
             </>
           ) : null}
-        </div>
-      )}
+    </div>
+  </>
+)}
+)}
 
    {/* — LEADER DASHBOARD — */}
 {view === "dashboard" && (
@@ -2692,8 +2694,6 @@ width: `${leaderGroup.length ? (leaderPrayedThisWeek.length / leaderGroup.length
         </div>
       ))}
 </div>
-  </>
-)}
 )}
       
       {/* ─── WEEK SUMMARY ─── */}
