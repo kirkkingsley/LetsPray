@@ -1424,20 +1424,19 @@ async function chooseCurrentLeader(leaderId) {
     });
 
     if (res.ok) {
-      const data = await res.json();
+  const data = await res.json();
 
-     if (data.valid && data.leaderId === leaderId) {
-  setCurrentLeaderId(leaderId);
-  setFilter("my-group");
-  localStorage.setItem("letspray-current-leader", leaderId);
-  setView("dashboard");
-  return;
-}
-      }
-    }
-  } catch (_e) {
-    // Fall through to PIN prompt.
+  if (data.valid && data.leaderId === leaderId) {
+    setCurrentLeaderId(leaderId);
+    setFilter("my-group");
+    localStorage.setItem("letspray-current-leader", leaderId);
+    setView("dashboard");
+    return;
   }
+}
+} catch (_e) {
+  // Fall through to PIN prompt.
+}
 
   localStorage.removeItem("leaderSessionToken");
   localStorage.removeItem("leaderSessionLeaderId");
