@@ -2017,7 +2017,7 @@ async function submitAdminPw() {
                   <div style={{ ...S.cardGhost, transform: "rotate(-1.5deg) translateY(3px)", opacity: 0.55 }} />
                   <div style={{ ...S.card, ...S.tapCard }}>
                     <svg width="52" height="52" viewBox="0 0 20 20" style={{ marginBottom: 12, flexShrink:0 }}><path d="M10,2 L11.768,8.232 L18,10 L11.768,11.768 L10,18 L8.232,11.768 L2,10 L8.232,8.232 Z" fill="#6b9e78" /></svg>
-                    <h2 style={S.tapTitle}>Tap to Begin</h2>
+                  <h2 style={S.tapTitle}>Start Praying</h2>
                     <p style={S.tapSub}>{deck.length} {filter === "all" ? "people" : filter.replace("-", " ")} ready</p>
                   </div>
                 </div>
