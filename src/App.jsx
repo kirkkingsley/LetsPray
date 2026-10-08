@@ -1432,9 +1432,8 @@ async function chooseCurrentLeader(leaderId) {
   localStorage.setItem("letspray-current-leader", leaderId);
   setView("dashboard");
   return;
-}
-      }
     }
+  }
   } catch (_e) {
     // Fall through to PIN prompt.
   }
@@ -1929,6 +1928,7 @@ async function submitAdminPw() {
 </div>
             </div>
 )}
+          {currentLeaderId && (
           <div style={S.controls}>
             <div style={S.togglePill}>
               <button onClick={() => { setOrder("random"); buildDeck(); }} style={{ ...S.toggleOpt, ...(order === "random" ? S.toggleOptOn : {}) }}>Shuffle</button>
@@ -2690,7 +2690,8 @@ width: `${leaderGroup.length ? (leaderPrayedThisWeek.length / leaderGroup.length
           </div>
         </div>
       ))}
-  </div>
+ </div>
+)}
 )}
       
       {/* ─── WEEK SUMMARY ─── */}
