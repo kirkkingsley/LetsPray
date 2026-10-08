@@ -1426,14 +1426,13 @@ async function chooseCurrentLeader(leaderId) {
     if (res.ok) {
       const data = await res.json();
 
-     if (data.valid && data.leaderId === leaderId) {
-  setCurrentLeaderId(leaderId);
-  setFilter("my-group");
-  localStorage.setItem("letspray-current-leader", leaderId);
-  setView("dashboard");
-  return;
+      if (data.valid && data.leaderId === leaderId) {
+        setCurrentLeaderId(leaderId);
+        setFilter("my-group");
+        localStorage.setItem("letspray-current-leader", leaderId);
+        return;
+      }
     }
-  }
   } catch (_e) {
     // Fall through to PIN prompt.
   }
@@ -1484,7 +1483,6 @@ async function chooseCurrentLeader(leaderId) {
 setPeople(refreshedPeople);
     setCurrentLeaderId(data.leaderId);
     setFilter("my-group");
-    setView("dashboard");
     setShowLeaderPinPrompt(false);
     setPendingLeaderId(null);
     setLeaderPinInput("");
@@ -1928,9 +1926,7 @@ async function submitAdminPw() {
 </div>
             </div>
 )}
-      {currentLeaderId && (
-  <>
-    <div style={S.controls}>
+          <div style={S.controls}>
             <div style={S.togglePill}>
               <button onClick={() => { setOrder("random"); buildDeck(); }} style={{ ...S.toggleOpt, ...(order === "random" ? S.toggleOptOn : {}) }}>Shuffle</button>
               <button onClick={() => { setOrder("alpha"); setCardIdx(0); if (shouldShowTap()) setReady(false); }} style={{
@@ -2011,7 +2007,7 @@ async function submitAdminPw() {
           ) : null}
           {(deck.length > 0 || pinnedPerson || keepPrayingMode) ? (
             <>
-            {false ? (
+              {!ready && !pinnedPerson ? (
                 /* ── Tap to Begin splash ── */
                 <div
                   style={S.cardOuter}
@@ -2326,10 +2322,8 @@ async function submitAdminPw() {
               )}
             </>
           ) : null}
-    </div>
-  </>
-)}
-)}
+        </div>
+      )}
 
    {/* — LEADER DASHBOARD — */}
 {view === "dashboard" && (
@@ -2693,7 +2687,7 @@ width: `${leaderGroup.length ? (leaderPrayedThisWeek.length / leaderGroup.length
           </div>
         </div>
       ))}
-</div>
+  </div>
 )}
       
       {/* ─── WEEK SUMMARY ─── */}
