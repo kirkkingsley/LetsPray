@@ -3569,7 +3569,7 @@ color: "rgba(255,255,255,0.68)",
   ddItem: { background: "none", border: "none", borderBottom: `1px solid ${C.faint}`, color: C.cream, padding: "11px 14px", fontSize: 13, cursor: "pointer", fontFamily: "'Inter', system-ui, sans-serif", display: "flex", justifyContent: "space-between", alignItems: "center", textAlign: "left" },
   ddItemPrayed: { color: C.muted },
   ddItemMeta: { fontSize: 11, color: C.muted, marginLeft: 8, flexShrink: 0, background: C.faint, borderRadius: 6, padding: "2px 7px" },
-  // TAP TO BEGIN
+  // Start Praying
   tapCard: { cursor: "pointer", alignItems: "center", justifyContent: "center", minHeight: 220, gap: 10, animation: "tapPulse 2s ease-in-out infinite" },
   tapCross: { fontSize: 28, color: C.accent, marginBottom: 8 },
   tapTitle: { fontFamily: "'Lora', Georgia, serif", fontSize: 36, fontWeight: 400, color: C.cream, margin: 0, textAlign: "center" },
