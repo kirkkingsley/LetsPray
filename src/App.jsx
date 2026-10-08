@@ -1426,11 +1426,13 @@ async function chooseCurrentLeader(leaderId) {
     if (res.ok) {
       const data = await res.json();
 
-      if (data.valid && data.leaderId === leaderId) {
-        setCurrentLeaderId(leaderId);
-        setFilter("my-group");
-        localStorage.setItem("letspray-current-leader", leaderId);
-        return;
+     if (data.valid && data.leaderId === leaderId) {
+  setCurrentLeaderId(leaderId);
+  setFilter("my-group");
+  localStorage.setItem("letspray-current-leader", leaderId);
+  setView("dashboard");
+  return;
+}
       }
     }
   } catch (_e) {
@@ -1483,6 +1485,7 @@ async function chooseCurrentLeader(leaderId) {
 setPeople(refreshedPeople);
     setCurrentLeaderId(data.leaderId);
     setFilter("my-group");
+    setView("dashboard");
     setShowLeaderPinPrompt(false);
     setPendingLeaderId(null);
     setLeaderPinInput("");
@@ -2007,7 +2010,7 @@ async function submitAdminPw() {
           ) : null}
           {(deck.length > 0 || pinnedPerson || keepPrayingMode) ? (
             <>
-              {!ready && !pinnedPerson ? (
+            {false ? (
                 /* ── Tap to Begin splash ── */
                 <div
                   style={S.cardOuter}
