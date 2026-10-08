@@ -1840,11 +1840,43 @@ async function submitAdminPw() {
       {/* ─── PRAY ─── */}
       {view === "pray" && (
         <div style={S.prayWrap}>
-         <div style={{ marginBottom:12 }}>
+       <div style={{ marginBottom: 16 }}>
+  {!currentLeaderId && (
+    <div style={{
+      fontSize: 11,
+      fontWeight: 700,
+      color: C.accent,
+      textTransform: "uppercase",
+      letterSpacing: "0.08em",
+      marginBottom: 6
+    }}>
+      Start Here
+    </div>
+  )}
+
+  {!currentLeaderId && (
+    <div style={{
+      fontSize: 15,
+      fontWeight: 600,
+      color: C.cream,
+      marginBottom: 9
+    }}>
+      Select your name to see your students
+    </div>
+  )}
+
   <select
     value={currentLeaderId}
     onChange={e => chooseCurrentLeader(e.target.value)}
-    style={{ ...S.filterSelect, width:"100%" }}
+    style={{
+      ...S.filterSelect,
+      width: "100%",
+      padding: currentLeaderId ? "10px 12px" : "14px 12px",
+      fontSize: currentLeaderId ? 13 : 16,
+      fontWeight: currentLeaderId ? 500 : 700,
+      border: `1px solid ${currentLeaderId ? C.border : C.accent}`,
+      borderRadius: 10
+    }}
   >
     <option value="">Who are you?</option>
     {people
