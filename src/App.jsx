@@ -1928,9 +1928,9 @@ async function submitAdminPw() {
 </div>
             </div>
 )}
-          {currentLeaderId && (
-          <div style={S.controls}>
-            <>
+      {currentLeaderId && (
+  <>
+    <div style={S.controls}>
             <div style={S.togglePill}>
               <button onClick={() => { setOrder("random"); buildDeck(); }} style={{ ...S.toggleOpt, ...(order === "random" ? S.toggleOptOn : {}) }}>Shuffle</button>
               <button onClick={() => { setOrder("alpha"); setCardIdx(0); if (shouldShowTap()) setReady(false); }} style={{
